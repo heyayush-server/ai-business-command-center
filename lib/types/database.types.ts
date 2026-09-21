@@ -343,9 +343,11 @@ export interface Database {
           priority: TaskPriority
           due_date: string | null
           assigned_to: string | null
+          created_by: string | null
           lead_id: string | null
           customer_id: string | null
           deal_id: string | null
+          deleted_at: string | null
           created_at: string
           updated_at: string
         }
@@ -358,9 +360,11 @@ export interface Database {
           priority?: TaskPriority
           due_date?: string | null
           assigned_to?: string | null
+          created_by?: string | null
           lead_id?: string | null
           customer_id?: string | null
           deal_id?: string | null
+          deleted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -373,9 +377,11 @@ export interface Database {
           priority?: TaskPriority
           due_date?: string | null
           assigned_to?: string | null
+          created_by?: string | null
           lead_id?: string | null
           customer_id?: string | null
           deal_id?: string | null
+          deleted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -385,6 +391,41 @@ export interface Database {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
             referencedColumns: ["id"]
           }
         ]
