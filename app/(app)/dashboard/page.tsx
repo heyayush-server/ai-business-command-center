@@ -1,51 +1,65 @@
 import React from "react"
-import { Sparkles, RefreshCw } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation"
+import { getCurrentOrganization } from "@/lib/auth/getCurrentOrganization"
+import { getDashboardData } from "@/lib/services/dashboard.service"
+import { getOrganizationMembers } from "@/lib/services/leads.service"
+import { getCustomerOptions } from "@/lib/services/deals.service"
+import { getTaskEntityOptions } from "@/lib/services/tasks.service"
 import { PageHeader } from "@/components/shared/page-header"
+import { DashboardQuickActions } from "@/components/features/dashboard/dashboard-quick-actions"
 import { MetricCards } from "@/components/features/dashboard/metric-cards"
 import { SalesPipelineChart } from "@/components/features/dashboard/sales-pipeline-chart"
 import { LeadConversionChart } from "@/components/features/dashboard/lead-conversion-chart"
 import { RecentActivity } from "@/components/features/dashboard/recent-activity"
 import { TasksDueSoon } from "@/components/features/dashboard/tasks-due-soon"
-import { AIInsightsPanel } from "@/components/features/dashboard/ai-insights-panel"
+import { PriorityWorkSection } from "@/components/features/dashboard/priority-work-section"
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const currentOrg = await getCurrentOrganization()
+
+  if (!currentOrg) {
+    redirect("/onboarding")
+  }
+
+  // Parallel server fetch of dashboard metrics and entity options for quick actions
+  const [dashboardData, members, customers, entityOptions] = await Promise.all([
+    getDashboardData(currentOrg.organizationId),
+    getOrganizationMembers(currentOrg.organizationId),
+    getCustomerOptions(currentOrg.organizationId),
+    getTaskEntityOptions(currentOrg.organizationId),
+  ])
+
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+      {/* Page Header with Quick Actions */}
       <PageHeader
         title="Executive Command Center"
-        description="Unified real-time metrics, pipeline health, operational tasks, and autonomous AI recommendations."
+        description={`Real-time business intelligence and operational management for ${currentOrg.organizationName}.`}
         action={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs h-8">
-              <RefreshCw className="h-3.5 w-3.5" />
-              <span>Refresh Feed</span>
-            </Button>
-            <Button size="sm" className="gap-1.5 text-xs h-8">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Generate AI Briefing</span>
-            </Button>
-          </div>
+          <DashboardQuickActions
+            members={members}
+            customers={customers}
+            entityOptions={entityOptions}
+          />
         }
       />
 
-      {/* 5 Core Metric Cards */}
-      <MetricCards />
+      {/* 1. KPI Cards */}
+      <MetricCards kpis={dashboardData.kpis} />
 
-      {/* AI Operational Intelligence Feed */}
-      <AIInsightsPanel />
+      {/* 2. Priority & Upcoming Work Queue */}
+      <PriorityWorkSection items={dashboardData.priorityWork} />
 
-      {/* Visual Analytics & Funnel Section */}
+      {/* 3. Sales Pipeline & Lead/Customer Conversion */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SalesPipelineChart />
-        <LeadConversionChart />
+        <SalesPipelineChart pipeline={dashboardData.pipeline} />
+        <LeadConversionChart summary={dashboardData.leadCustomer} />
       </div>
 
-      {/* Operational Task Queue & Immutable Activity Stream */}
+      {/* 4. Operational Task Queue & Immutable Activity Stream */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TasksDueSoon />
-        <RecentActivity />
+        <TasksDueSoon overview={dashboardData.taskOverview} />
+        <RecentActivity activities={dashboardData.recentActivities} />
       </div>
     </div>
   )
