@@ -1,18 +1,21 @@
 import { LandingNavbar } from "@/components/features/landing/landing-navbar"
 import { HeroSection } from "@/components/features/landing/hero-section"
-import { InteractiveDemo } from "@/components/features/landing/interactive-demo"
 import { ScrollStorySection } from "@/components/features/landing/scroll-story-section"
+import { BeforeAfterBanner } from "@/components/features/landing/before-after-banner"
 import { CRMIntelligenceSection } from "@/components/features/landing/crm-intelligence-section"
-import { ProactiveInsightsSection } from "@/components/features/landing/proactive-insights-section"
+import { AICopilotSection } from "@/components/features/landing/ai-copilot-section"
 import { RAGKnowledgeSection } from "@/components/features/landing/rag-knowledge-section"
+import { ProactiveInsightsSection } from "@/components/features/landing/proactive-insights-section"
+import { HumanControlSection } from "@/components/features/landing/human-control-section"
 import { SecuritySection } from "@/components/features/landing/security-section"
+import { InteractiveDemo } from "@/components/features/landing/interactive-demo"
 import { CTASection } from "@/components/features/landing/cta-section"
 import { LandingFooter } from "@/components/features/landing/landing-footer"
 
 export const metadata = {
-  title: "AI Business Command Center — Autonomous SaaS Operations & AI Copilot",
+  title: "AI Business Command Center — Your Business. One Intelligent Command Center.",
   description:
-    "Enterprise-grade business operations platform synthesizing leads, visual deal pipelines, task orchestration, pgvector RAG, and proactive business intelligence with human supervisory approval.",
+    "Keep your leads, customers, deals, tasks and business knowledge in one place — and let AI help you understand what needs attention.",
 }
 
 export default function LandingPage() {
@@ -22,32 +25,41 @@ export default function LandingPage() {
       <LandingNavbar />
 
       <main className="flex-1 space-y-0">
-        {/* 2. High-Impact Hero with 3D Mouse Tilt Parallax */}
+        {/* 2. Hero — Immediate Understanding & 3D Mouse Parallax */}
         <HeroSection />
 
-        {/* 3. Live Interactive Product Demonstration (Client Sandbox) */}
-        <InteractiveDemo />
-
-        {/* 4. Scroll-Based Product Story (Silos → Foundation → Proactive Intelligence → Supervised Action) */}
+        {/* 3. The Problem & Solution Journey — "What gets easier?" */}
         <ScrollStorySection />
 
-        {/* 5. Core CRM Intelligence Suite */}
+        {/* 4. "What It Solves" Continuous Comparison Marquee */}
+        <BeforeAfterBanner />
+
+        {/* 5. One Place for Your Business (Leads, Customers, Deals, Tasks, Activity, Knowledge) */}
         <CRMIntelligenceSection />
 
-        {/* 6. Proactive Business Intelligence & Deterministic Signals (Phase 14) */}
-        <ProactiveInsightsSection />
+        {/* 6. AI Copilot — "Ask your business anything." */}
+        <AICopilotSection />
 
-        {/* 7. Grounded RAG Knowledge Base (Phase 12) */}
+        {/* 7. Business Knowledge — "Your AI knows your business." */}
         <RAGKnowledgeSection />
 
-        {/* 8. Zero-Trust PostgreSQL Row-Level Security Architecture */}
+        {/* 8. Proactive Insights — "Don't wait for problems to find you." */}
+        <ProactiveInsightsSection />
+
+        {/* 9. AI Actions + Human Control — "AI helps. You stay in control." */}
+        <HumanControlSection />
+
+        {/* 10. Security & Trust — "Private. Secure. Built for your business." */}
         <SecuritySection />
 
-        {/* 9. Final Call-to-Action */}
+        {/* 11. Interactive Live Demonstration (Client Sandbox) */}
+        <InteractiveDemo />
+
+        {/* 12. Final Call-to-Action */}
         <CTASection />
       </main>
 
-      {/* 10. Professional Engineering Footer */}
+      {/* 13. Professional Footer */}
       <LandingFooter />
     </div>
   )

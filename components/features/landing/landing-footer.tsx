@@ -20,17 +20,17 @@ export function LandingFooter() {
               </span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-md">
-              An enterprise operations command center and autonomous AI Copilot. Combines customer lifecycles, deal pipelines, tasks, pgvector RAG, and proactive business intelligence into a secure multi-tenant workspace.
+              Keep your leads, customers, deals, tasks and business knowledge in one place — and let AI help you understand what needs attention.
             </p>
             <p className="text-[11px] text-muted-foreground pt-1">
-              Engineering portfolio project by Ishan Sharma.
+              Built with precision for growing organizations.
             </p>
           </div>
 
-          {/* Col 2: Navigation */}
+          {/* Col 2: Workspace Navigation */}
           <div className="space-y-2.5">
             <span className="font-semibold text-foreground text-xs uppercase tracking-wider block">
-              Application Modules
+              Workspace Modules
             </span>
             <ul className="space-y-1.5 text-xs">
               <li>
@@ -45,61 +45,61 @@ export function LandingFooter() {
               </li>
               <li>
                 <Link href="/deals" className="hover:text-foreground transition-colors">
-                  Deals &amp; Kanban Pipeline
+                  Deals &amp; Revenue Pipeline
                 </Link>
               </li>
               <li>
                 <Link href="/tasks" className="hover:text-foreground transition-colors">
-                  Tasks &amp; SLA Reminders
+                  Tasks &amp; To-Dos
                 </Link>
               </li>
               <li>
                 <Link href="/customers" className="hover:text-foreground transition-colors">
-                  Customer Accounts
+                  Customer Directory
                 </Link>
               </li>
               <li>
                 <Link href="/ai" className="hover:text-foreground transition-colors">
-                  AI Copilot Console
+                  AI Assistant
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Architecture & Docs */}
+          {/* Col 3: Product Story */}
           <div className="space-y-2.5">
             <span className="font-semibold text-foreground text-xs uppercase tracking-wider block">
-              Architecture &amp; Docs
+              Platform Story
             </span>
             <ul className="space-y-1.5 text-xs">
               <li>
-                <a href="#interactive-demo" className="hover:text-foreground transition-colors">
-                  Interactive Live Sandbox
+                <a href="#how-it-works" className="hover:text-foreground transition-colors">
+                  What Gets Easier?
                 </a>
               </li>
               <li>
-                <a href="#insights" className="hover:text-foreground transition-colors">
-                  Proactive Insights Engine
+                <a href="#product" className="hover:text-foreground transition-colors">
+                  One Place for Your Business
+                </a>
+              </li>
+              <li>
+                <a href="#ai-assistant" className="hover:text-foreground transition-colors">
+                  AI Copilot
                 </a>
               </li>
               <li>
                 <a href="#knowledge" className="hover:text-foreground transition-colors">
-                  RAG Vector Knowledge
+                  Business Knowledge
                 </a>
               </li>
               <li>
-                <a href="#security" className="hover:text-foreground transition-colors">
-                  PostgreSQL Row-Level Security
+                <a href="#insights" className="hover:text-foreground transition-colors">
+                  Proactive Insights
                 </a>
               </li>
               <li>
-                <a
-                  href="/docs/insights.md"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-foreground transition-colors"
-                >
-                  Insights Architecture Spec
+                <a href="#interactive-demo" className="hover:text-foreground transition-colors">
+                  Interactive Live Demo
                 </a>
               </li>
             </ul>
@@ -107,15 +107,13 @@ export function LandingFooter() {
         </div>
 
         <div className="pt-6 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px]">
-          <p>© 2026 AI Business Command Center. All completed phases verified (Phases 0–14).</p>
-          <div className="flex items-center gap-4 text-muted-foreground">
-            <span>Next.js 16</span>
+          <p>© 2026 AI Business Command Center. All rights reserved.</p>
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <span>Private &amp; Secure</span>
             <span>•</span>
-            <span>React 19</span>
+            <span>Human-Approved AI</span>
             <span>•</span>
-            <span>Supabase RLS</span>
-            <span>•</span>
-            <span>Vercel AI SDK 7.0</span>
+            <span>Real-Time Business Operations</span>
           </div>
         </div>
       </div>

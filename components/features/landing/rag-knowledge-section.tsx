@@ -3,9 +3,8 @@
 import * as React from "react"
 import {
   FileText,
-  Database,
-  Search,
-  CheckCircle2,
+  Bot,
+  ArrowDown,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
@@ -14,100 +13,129 @@ export function RAGKnowledgeSection() {
     <section id="knowledge" className="py-20 lg:py-28 bg-muted/20 border-t border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Text */}
+          {/* Left Column: Plain-Language Value Proposition */}
           <div className="lg:col-span-6 space-y-6">
-            <Badge variant="secondary" className="px-3 py-1 text-xs gap-1.5 font-medium">
-              <Database className="h-3.5 w-3.5 text-primary" />
-              <span>Phase 12 RAG Knowledge Base</span>
+            <Badge variant="secondary" className="px-3.5 py-1 text-xs gap-1.5 font-medium">
+              <FileText className="h-3.5 w-3.5 text-primary" />
+              <span>Business Knowledge</span>
             </Badge>
 
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Ground Your AI in Verified Company Truth
+              Your AI Knows Your Business.
             </h2>
 
             <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              Upload company SOPs, onboarding handbooks, refund policies, and sales playbooks. The AI assistant answers internal questions using high-dimensional semantic vector search over PostgreSQL <code className="font-mono bg-muted px-1 rounded text-xs">pgvector</code>.
+              Ask your business questions. Your AI can search the documents and information you&apos;ve already added — giving you exact answers without digging through files.
             </p>
 
-            <div className="space-y-3 pt-2 text-xs">
+            {/* 3 Step Visual Sequence */}
+            <div className="space-y-4 pt-2 text-xs">
               <div className="flex items-start gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary font-bold shrink-0 mt-0.5">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-bold shrink-0 mt-0.5">
                   1
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground">Private Storage &amp; Chunking</h4>
-                  <p className="text-muted-foreground">Files (PDF, TXT, MD) are stored in private Supabase Storage buckets with organization-scoped RLS policies.</p>
+                  <h4 className="text-sm font-semibold text-foreground">Upload Your Documents</h4>
+                  <p className="text-muted-foreground mt-0.5">
+                    Add your company policies, sales playbooks, price lists, or onboarding guides in PDF or text format.
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary font-bold shrink-0 mt-0.5">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary font-bold shrink-0 mt-0.5">
                   2
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground">PostgreSQL pgvector Embeddings</h4>
-                  <p className="text-muted-foreground">Chunks are embedded and matched using cosine similarity directly inside PostgreSQL — no expensive external vector database needed.</p>
+                  <h4 className="text-sm font-semibold text-foreground">AI Finds the Right Information</h4>
+                  <p className="text-muted-foreground mt-0.5">
+                    When anyone on your team asks a question, the AI reads the relevant sections in seconds.
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 font-bold shrink-0 mt-0.5">
-                  ✓
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold shrink-0 mt-0.5">
+                  3
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground">Prompt Injection Defense</h4>
-                  <p className="text-muted-foreground">Document content is treated as strictly untrusted reference data; instructions in uploaded files cannot trigger unauthorized tool actions.</p>
+                  <h4 className="text-sm font-semibold text-foreground">Answers with Verified Sources</h4>
+                  <p className="text-muted-foreground mt-0.5">
+                    The AI points directly to the document it used, so you always know where the answer came from.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Visual RAG Pipeline Card */}
-          <div className="lg:col-span-6 rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-border/60 pb-3">
-              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Search className="h-3.5 w-3.5 text-primary" />
-                Semantic Vector Search Pipeline
-              </span>
-              <Badge variant="outline" className="text-[10px] font-mono text-emerald-600">
-                Cosine Similarity &gt; 0.90
-              </Badge>
-            </div>
-
-            {/* Simulated Query */}
-            <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1 text-xs">
-              <span className="text-[10px] text-muted-foreground font-mono">User Query:</span>
-              <p className="font-semibold text-foreground">
-                &quot;What is our policy for contract discounts exceeding $50,000?&quot;
-              </p>
-            </div>
-
-            {/* Retrieved Chunk */}
-            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3.5 space-y-2 text-xs">
+          {/* Right Column: Visual Flow from Document to AI Answer */}
+          <div className="lg:col-span-6 rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xl space-y-5">
+            {/* Step 1: Uploaded Document Card */}
+            <div className="rounded-xl border border-border bg-muted/40 p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] text-primary font-semibold flex items-center gap-1">
-                  <FileText className="h-3 w-3" />
-                  Enterprise_Pricing_Guidelines.pdf (Chunk #3)
-                </span>
-                <Badge variant="secondary" className="text-[9px] font-mono">Score: 0.942</Badge>
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <FileText className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-foreground block">
+                      Company_Refund_Policy_2026.pdf
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      Added by Operations • Active Document
+                    </span>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-600 bg-emerald-500/5">
+                  Uploaded &amp; Ready
+                </Badge>
               </div>
-              <p className="text-[11px] text-foreground leading-relaxed italic bg-background/80 p-2.5 rounded border border-border/40">
-                &quot;Custom contract discounts exceeding 15% or contract values exceeding $50,000 require written sign-off from the VP of Operations before proposal dispatch.&quot;
+
+              <div className="rounded-lg bg-background/80 p-2.5 text-[11px] text-muted-foreground border border-border/50 italic">
+                &ldquo;...customers may request a full refund within 30 days of purchase for unused annual licenses upon written confirmation.&rdquo;
+              </div>
+            </div>
+
+            {/* Visual Arrow Flow */}
+            <div className="flex items-center justify-center gap-2 text-primary font-medium text-xs py-0.5">
+              <ArrowDown className="h-4 w-4 animate-bounce" />
+              <span>AI connects document to your question</span>
+            </div>
+
+            {/* Step 2: User Question */}
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3.5 space-y-1">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-primary font-semibold">
+                User Question
+              </span>
+              <p className="text-xs sm:text-sm font-semibold text-foreground">
+                &ldquo;What is our refund policy for annual licenses?&rdquo;
               </p>
             </div>
 
-            {/* AI Synthesized Answer with Citation */}
-            <div className="rounded-lg border border-border bg-background p-3.5 space-y-1.5 text-xs">
-              <div className="flex items-center gap-1.5 text-foreground font-semibold">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                <span>Verified Assistant Answer</span>
+            {/* Step 3: AI Answer with Document Source */}
+            <div className="rounded-xl border border-border bg-card p-4 space-y-2.5 shadow-xs">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                  <Bot className="h-4 w-4 text-primary" />
+                  <span>AI Assistant Answer</span>
+                </div>
+                <Badge variant="secondary" className="text-[10px] font-mono">
+                  Verified from your documents
+                </Badge>
               </div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                According to your pricing guidelines, contracts exceeding $50,000 require approval from the VP of Operations before presenting to the client.
+
+              <p className="text-xs text-foreground leading-relaxed">
+                According to your uploaded policy document, customers can request a full refund within <strong>30 days of purchase</strong> for unused annual licenses upon written confirmation.
               </p>
-              <span className="text-[10px] font-mono text-primary block pt-1">
-                Source: Enterprise_Pricing_Guidelines.pdf
-              </span>
+
+              {/* Source Indicator Tag */}
+              <div className="pt-2 border-t border-border/60 flex items-center justify-between text-[11px]">
+                <div className="flex items-center gap-1 text-primary font-medium">
+                  <FileText className="h-3 w-3" />
+                  <span>Source: Company_Refund_Policy_2026.pdf (Section 3.1)</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">100% Grounded</span>
+              </div>
             </div>
           </div>
         </div>

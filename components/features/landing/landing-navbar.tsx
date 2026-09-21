@@ -4,13 +4,31 @@ import * as React from "react"
 import Link from "next/link"
 import { Sparkles, ArrowRight, Menu, X } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 
 export function LandingNavbar() {
   const [mobileOpen, setMobileOpen] = React.useState(false)
+  const [scrolled, setScrolled] = React.useState(false)
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setScrolled(true)
+      } else {
+        setScrolled(false)
+      }
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/90 backdrop-blur-md transition-all">
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        scrolled
+          ? "border-b border-border/80 bg-background/95 backdrop-blur-md shadow-xs"
+          : "border-b border-transparent bg-background/60 backdrop-blur-xs"
+      }`}
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-3 group">
@@ -18,36 +36,31 @@ export function LandingNavbar() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold tracking-tight text-foreground leading-tight">
-                Command Center
-              </span>
-              <Badge variant="outline" className="text-[9px] font-mono px-1 py-0 h-4 border-primary/30 text-primary">
-                Phase 14
-              </Badge>
-            </div>
+            <span className="text-sm font-bold tracking-tight text-foreground leading-tight">
+              Command Center
+            </span>
             <span className="text-[10px] font-medium tracking-wide uppercase text-muted-foreground">
-              Autonomous Business Intelligence
+              One Intelligent Workspace
             </span>
           </div>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-7 text-xs font-medium text-muted-foreground">
-          <a href="#interactive-demo" className="hover:text-foreground transition-colors">
-            Live Demo
+        <nav className="hidden lg:flex items-center gap-8 text-xs font-medium text-muted-foreground">
+          <a href="#how-it-works" className="hover:text-foreground transition-colors">
+            How It Works
           </a>
-          <a href="#story" className="hover:text-foreground transition-colors">
-            Product Story
+          <a href="#product" className="hover:text-foreground transition-colors">
+            Product
           </a>
-          <a href="#crm-suite" className="hover:text-foreground transition-colors">
-            CRM Suite
+          <a href="#ai-assistant" className="hover:text-foreground transition-colors">
+            AI Assistant
           </a>
           <a href="#insights" className="hover:text-foreground transition-colors">
-            Proactive Insights
+            Insights
           </a>
-          <a href="#security" className="hover:text-foreground transition-colors">
-            Security & RLS
+          <a href="#interactive-demo" className="hover:text-foreground transition-colors">
+            Live Demo
           </a>
         </nav>
 
@@ -71,7 +84,7 @@ export function LandingNavbar() {
               className: "gap-1.5 shadow-xs font-medium text-xs h-8 px-3.5",
             })}
           >
-            <span>Launch Workspace</span>
+            <span>Try the Command Center</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
 
@@ -88,42 +101,42 @@ export function LandingNavbar() {
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="border-b border-border/80 bg-background/98 px-4 pt-3 pb-5 space-y-3 lg:hidden">
+        <div className="border-b border-border/80 bg-background/98 px-4 pt-3 pb-5 space-y-3 lg:hidden shadow-lg animate-in slide-in-from-top-2 duration-200">
           <nav className="flex flex-col space-y-2 text-sm font-medium text-muted-foreground">
             <a
-              href="#interactive-demo"
+              href="#how-it-works"
               onClick={() => setMobileOpen(false)}
               className="px-2 py-1.5 rounded-md hover:bg-muted hover:text-foreground transition-colors"
             >
-              Interactive Live Demo
+              How It Works
             </a>
             <a
-              href="#story"
+              href="#product"
               onClick={() => setMobileOpen(false)}
               className="px-2 py-1.5 rounded-md hover:bg-muted hover:text-foreground transition-colors"
             >
-              Product Story
+              Product
             </a>
             <a
-              href="#crm-suite"
+              href="#ai-assistant"
               onClick={() => setMobileOpen(false)}
               className="px-2 py-1.5 rounded-md hover:bg-muted hover:text-foreground transition-colors"
             >
-              CRM Modules
+              AI Assistant
             </a>
             <a
               href="#insights"
               onClick={() => setMobileOpen(false)}
               className="px-2 py-1.5 rounded-md hover:bg-muted hover:text-foreground transition-colors"
             >
-              Proactive Business Intelligence
+              Proactive Insights
             </a>
             <a
-              href="#security"
+              href="#interactive-demo"
               onClick={() => setMobileOpen(false)}
               className="px-2 py-1.5 rounded-md hover:bg-muted hover:text-foreground transition-colors"
             >
-              Security Architecture
+              Live Demo
             </a>
           </nav>
           <div className="pt-2 border-t border-border flex items-center justify-between">
@@ -131,7 +144,7 @@ export function LandingNavbar() {
               href="/login"
               className={buttonVariants({ variant: "outline", size: "sm", className: "w-full text-xs" })}
             >
-              Sign In to Account
+              Sign In to Workspace
             </Link>
           </div>
         </div>

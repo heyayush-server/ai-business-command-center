@@ -225,6 +225,46 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+## 🌟 Phase 15: Premium Interactive Landing Page Experience
+
+The public landing page (`/`) is engineered to communicate the full value of the AI Business Command Center to non-technical business decision-makers using **plain business language** while showcasing world-class frontend engineering, animation, and visual storytelling:
+
+1. **Hero — Immediate Understanding**:
+   - Headline: *"Your Business. One Intelligent Command Center."*
+   - Supporting Copy: *"Keep your leads, customers, deals, tasks and business knowledge in one place — and let AI help you understand what needs attention."*
+   - Real product dashboard UI visual with sequential entrance animations and subtle 3D mouse parallax on desktop (disabled on touch and reduced-motion).
+
+2. **Problem ➔ Solution Scroll Story ("What Gets Easier?")**:
+   - Visualizes common business fragmentation (spreadsheets, emails, tasks, loose files) converging into one central workspace.
+   - Features photorealistic modern executive workspace imagery to communicate operational clarity.
+
+3. **"What It Solves" Continuous Running Marquee**:
+   - Real-time comparison ticker contrasting the *Before* state (missed follow-ups, scattered data, forgotten tasks) with the *After* state (clear daily priorities, human-approved AI, central visibility).
+   - Pauses on hover and respects `prefers-reduced-motion`.
+
+4. **One Place for Your Business**:
+   - 6 core business modules represented visually: **Leads**, **Customers**, **Deals**, **Tasks**, **Activity**, and **Knowledge**.
+   - Interactive card exploration showing how each asset connects directly into the central dashboard.
+
+5. **AI Copilot ("Ask Your Business Anything")**:
+   - Multi-step simulated conversation showing real business inquiries: identifying inactive leads, inspecting deal value, and preparing follow-ups with human sign-off.
+
+6. **Knowledge-Aware AI ("Your AI Knows Your Business")**:
+   - Plain-language explanation of grounded document intelligence.
+   - Visual flow from document upload (refund policy PDF) to grounded answer with verified source citation.
+
+7. **Proactive Insights ("Don't Wait for Problems to Find You")**:
+   - Live interactive sandbox demonstrating how the platform surfaces overdue tasks, stale leads, and deal velocity risks into a unified "Today's Attention" briefing.
+
+8. **AI Actions + Human Control ("AI Helps. You Stay in Control")**:
+   - Demonstrates the two-phase supervisory gate: AI drafts the task or follow-up, displays preview parameters, and waits for one-click human approval before modifying records.
+
+9. **Live Interactive Product Demonstration**:
+   - 100% isolated, client-side sandbox allowing visitors to step through an end-to-end operational workflow without mutating production databases.
+
+---
+
+
 ## 🧪 Testing
 
 The repository maintains an automated Vitest test suite verifying domain services, schema validations, MCP tools, and organization isolation:

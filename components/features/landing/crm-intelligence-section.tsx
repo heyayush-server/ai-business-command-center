@@ -7,140 +7,169 @@ import {
   ListTodo,
   Building2,
   Activity,
-  ArrowRight,
+  FileText,
   CheckCircle2,
+  ArrowRight,
+  Layers,
+  Sparkles,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-const CRM_MODULES = [
+const BUSINESS_MODULES = [
   {
+    id: "leads",
     icon: <Users className="h-5 w-5 text-blue-600" />,
-    title: "Leads & Qualification",
-    badge: "Lifecycle Tracking",
+    title: "Leads",
+    badge: "Prospect Flow",
     description:
-      "Capture prospect interest, track qualification stages from 'new' to 'qualified', and seamlessly convert qualified leads into customer accounts with full history preservation.",
-    stat: "42 Active Leads",
-    feature: "Zero Orphaned Leads",
+      "Capture prospect inquiries, track qualification status, and know exactly which leads need follow-up before they grow cold.",
+    metric: "32 Active Prospects",
+    detail: "Automatic follow-up tracking",
   },
   {
-    icon: <TrendingUp className="h-5 w-5 text-emerald-600" />,
-    title: "Deals & Visual Pipeline",
-    badge: "Kanban Velocity",
-    description:
-      "Manage pipeline across discovery, proposal, negotiation, closed_won, and closed_lost stages with weighted probabilities, currency values, and expected close dates.",
-    stat: "$142,800 Pipeline",
-    feature: "Stage-Gate Validation",
-  },
-  {
-    icon: <ListTodo className="h-5 w-5 text-violet-600" />,
-    title: "Operational Tasks & SLAs",
-    badge: "Deadlines & Priority",
-    description:
-      "Orchestrate operational tasks with high, medium, and urgent priorities. Explicitly link tasks to leads, deals, or customers with automated overdue alerting.",
-    stat: "27 Open Tasks",
-    feature: "SLA Overdue Tracking",
-  },
-  {
+    id: "customers",
     icon: <Building2 className="h-5 w-5 text-amber-600" />,
-    title: "360° Customer Directory",
-    badge: "Account Retention",
+    title: "Customers",
+    badge: "Account Directory",
     description:
-      "Centralized directory of corporate accounts with primary contact details, industry categorization, linked deal history, and health indicators.",
-    stat: "89 Accounts",
-    feature: "98.4% Retention",
+      "A complete directory of all client organizations with primary contacts, contract history, and linked communication records.",
+    metric: "89 Accounts",
+    detail: "360° relationship timeline",
   },
   {
-    icon: <Activity className="h-5 w-5 text-rose-600" />,
-    title: "Immutable Activity Stream",
-    badge: "Audit Integrity",
+    id: "deals",
+    icon: <TrendingUp className="h-5 w-5 text-emerald-600" />,
+    title: "Deals",
+    badge: "Revenue Pipeline",
     description:
-      "Append-only audit trail logging every user and AI tool action. Complete visibility into what happened, who approved it, and when it executed.",
-    stat: "100% Audited",
-    feature: "Tamper-Proof Log",
+      "Visualize your sales pipeline across distinct stages from initial contact to won. Monitor total pipeline value at a glance.",
+    metric: "$142,500 Active",
+    detail: "Real-time stage velocity",
+  },
+  {
+    id: "tasks",
+    icon: <ListTodo className="h-5 w-5 text-violet-600" />,
+    title: "Tasks",
+    badge: "Daily Execution",
+    description:
+      "Prioritize operational to-dos with clear deadlines, priority levels, and assignments linked directly to clients and deals.",
+    metric: "5 Due Today",
+    detail: "Zero forgotten deadlines",
+  },
+  {
+    id: "activity",
+    icon: <Activity className="h-5 w-5 text-rose-600" />,
+    title: "Activity",
+    badge: "Audit History",
+    description:
+      "A chronological, transparent log of every email, call, note, and update made across your organization.",
+    metric: "100% Tracked",
+    detail: "Clear accountability",
+  },
+  {
+    id: "knowledge",
+    icon: <FileText className="h-5 w-5 text-primary" />,
+    title: "Knowledge",
+    badge: "Business Library",
+    description:
+      "Upload your company playbooks, refund policies, and pricing sheets so your AI assistant can answer team questions instantly.",
+    metric: "Documents at Hand",
+    detail: "Instant answers with citations",
   },
 ]
 
 export function CRMIntelligenceSection() {
+  const [selectedModule, setSelectedModule] = React.useState<string>("deals")
+
   return (
-    <section id="crm-suite" className="py-20 lg:py-28 bg-muted/20 border-t border-border">
+    <section id="product" className="py-20 lg:py-28 bg-muted/20 border-t border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mx-auto max-w-2xl text-center space-y-3 mb-16">
-          <Badge variant="secondary" className="px-3 py-1 text-xs font-medium">
-            Core Business Engine
+          <Badge variant="secondary" className="px-3.5 py-1 text-xs font-medium gap-1.5">
+            <Layers className="h-3.5 w-3.5 text-primary" />
+            <span>One Place for Your Business</span>
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Five Operational Levers, One Command Center
+            Everything Your Team Needs Under One Roof
           </h2>
           <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-            Eliminate fragmented tools with a tightly coupled relational system where every prospect, deal, task, and account is linked.
+            Stop switching between separate tools and searching for missing information. See your leads, customers, deals, and tasks in one place.
           </p>
         </div>
 
-        {/* Modules Grid */}
+        {/* 6 Modular Business Asset Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {CRM_MODULES.map((module) => (
-            <Card
-              key={module.title}
-              className="border-border bg-card shadow-xs hover:shadow-md transition-all hover:-translate-y-1 duration-200"
-            >
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                    {module.icon}
+          {BUSINESS_MODULES.map((module) => {
+            const isSelected = selectedModule === module.id
+            return (
+              <Card
+                key={module.id}
+                onClick={() => setSelectedModule(module.id)}
+                className={`cursor-pointer transition-all duration-300 ${
+                  isSelected
+                    ? "border-primary/50 bg-card shadow-lg ring-1 ring-primary/30 -translate-y-1"
+                    : "border-border bg-card/80 shadow-xs hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5"
+                }`}
+              >
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted shadow-2xs">
+                      {module.icon}
+                    </div>
+                    <Badge
+                      variant={isSelected ? "default" : "outline"}
+                      className="text-[10px] font-mono tracking-wide uppercase"
+                    >
+                      {module.badge}
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="text-[10px] font-mono">
-                    {module.badge}
-                  </Badge>
-                </div>
 
-                <div className="space-y-1.5">
-                  <h3 className="text-base font-bold text-foreground">{module.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {module.description}
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs">
-                  <span className="font-semibold text-foreground">{module.stat}</span>
-                  <div className="flex items-center gap-1 text-primary text-[11px] font-medium">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    <span>{module.feature}</span>
+                  <div className="space-y-1.5">
+                    <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                      <span>{module.title}</span>
+                      {isSelected && (
+                        <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                      )}
+                    </h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {module.description}
+                    </p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
 
-          {/* 6th Card: MCP Intelligence Integration */}
-          <Card className="border-primary/30 bg-primary/5 shadow-xs hover:shadow-md transition-all hover:-translate-y-1 duration-200 flex flex-col justify-between">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-2xs">
-                  MCP
-                </div>
-                <Badge variant="default" className="text-[10px] font-mono">
-                  Phase 13 Active
-                </Badge>
-              </div>
+                  <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs">
+                    <span className="font-semibold text-foreground">{module.metric}</span>
+                    <div className="flex items-center gap-1 text-primary text-[11px] font-medium">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      <span>{module.detail}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
 
-              <div className="space-y-1.5">
-                <h3 className="text-base font-bold text-foreground">MCP Tool Layer Integration</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Every CRM domain exposes typed, role-gated AI tools. Read queries execute instantly; write actions stage pending mutations for human sign-off.
-                </p>
-              </div>
-
-              <div className="pt-3 border-t border-border/60 flex items-center justify-between text-xs">
-                <span className="font-semibold text-foreground">12 Business Tools</span>
-                <span className="text-primary text-[11px] font-medium flex items-center gap-1">
-                  <span>Explore MCP</span>
-                  <ArrowRight className="h-3 w-3" />
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Dynamic Integration Banner showing how the selected card fits into Command Center */}
+        <div className="mt-10 rounded-xl border border-primary/20 bg-primary/5 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-foreground">
+                Connected Together, Not Isolated in Silos
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Every customer connects to their deals. Every deal generates tasks. Every document powers the AI assistant.
+              </p>
+            </div>
+          </div>
+          <div className="shrink-0 flex items-center gap-2 text-xs font-semibold text-primary hover:underline cursor-pointer">
+            <span>Explore all modules</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </div>
         </div>
       </div>
     </section>
