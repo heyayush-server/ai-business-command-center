@@ -2,12 +2,14 @@ import React from "react"
 import { redirect } from "next/navigation"
 import { getCurrentOrganization } from "@/lib/auth/getCurrentOrganization"
 import { getDashboardData } from "@/lib/services/dashboard.service"
+import { getBusinessInsights } from "@/lib/services/insights.service"
 import { getOrganizationMembers } from "@/lib/services/leads.service"
 import { getCustomerOptions } from "@/lib/services/deals.service"
 import { getTaskEntityOptions } from "@/lib/services/tasks.service"
 import { PageHeader } from "@/components/shared/page-header"
 import { DashboardQuickActions } from "@/components/features/dashboard/dashboard-quick-actions"
 import { MetricCards } from "@/components/features/dashboard/metric-cards"
+import { AIInsightsPanel } from "@/components/features/dashboard/ai-insights-panel"
 import { SalesPipelineChart } from "@/components/features/dashboard/sales-pipeline-chart"
 import { LeadConversionChart } from "@/components/features/dashboard/lead-conversion-chart"
 import { RecentActivity } from "@/components/features/dashboard/recent-activity"
@@ -21,9 +23,10 @@ export default async function DashboardPage() {
     redirect("/onboarding")
   }
 
-  // Parallel server fetch of dashboard metrics and entity options for quick actions
-  const [dashboardData, members, customers, entityOptions] = await Promise.all([
+  // Parallel server fetch of dashboard metrics, proactive insights, and entity options
+  const [dashboardData, insightsData, members, customers, entityOptions] = await Promise.all([
     getDashboardData(currentOrg.organizationId),
+    getBusinessInsights(currentOrg.organizationId),
     getOrganizationMembers(currentOrg.organizationId),
     getCustomerOptions(currentOrg.organizationId),
     getTaskEntityOptions(currentOrg.organizationId),
@@ -47,7 +50,13 @@ export default async function DashboardPage() {
       {/* 1. KPI Cards */}
       <MetricCards kpis={dashboardData.kpis} />
 
-      {/* 2. Priority & Upcoming Work Queue */}
+      {/* 2. Proactive AI Business Intelligence Feed */}
+      <AIInsightsPanel
+        insights={insightsData.insights}
+        briefing={insightsData.briefing}
+      />
+
+      {/* 3. Priority & Upcoming Work Queue */}
       <PriorityWorkSection items={dashboardData.priorityWork} />
 
       {/* 3. Sales Pipeline & Lead/Customer Conversion */}

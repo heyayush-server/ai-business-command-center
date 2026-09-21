@@ -148,8 +148,76 @@ export async function handleMockChat({
 
   // ── Route query to the most appropriate read-only tool ────────────────────
 
-
   if (
+    q.includes("attention") ||
+    q.includes("insight") ||
+    q.includes("briefing") ||
+    q.includes("focus") ||
+    q.includes("risk") ||
+    q.includes("anomal") ||
+    q.includes("stuck") ||
+    (q.includes("lead") && (q.includes("follow") || q.includes("need"))) ||
+    (q.includes("deal") && (q.includes("risk") || q.includes("stale") || q.includes("attention"))) ||
+    (q.includes("customer") && q.includes("inactive"))
+  ) {
+    toolName = "get_business_insights"
+    const entityType = q.includes("deal")
+      ? "deal"
+      : q.includes("lead")
+      ? "lead"
+      : q.includes("task")
+      ? "task"
+      : q.includes("customer")
+      ? "customer"
+      : undefined
+
+    toolArgs = entityType ? { entity_type: entityType } : {}
+    const execute = tools.get_business_insights.execute as unknown as AnyFn
+    const res = (await execute(toolArgs)) as {
+      briefing: {
+        headline: string
+        summary: string
+        keyFindings: string[]
+        metrics: {
+          totalInsights: number
+          criticalCount: number
+          warningCount: number
+          infoCount: number
+          overdueTasksCount: number
+          staleLeadsCount: number
+          staleDealsCount: number
+          inactiveCustomersCount: number
+        }
+      }
+      insights: Array<{
+        id: string
+        type: string
+        severity: string
+        title: string
+        description: string
+        recommendedAction: string | null
+      }>
+      total: number
+    }
+    toolResult = res
+
+    if (res.total === 0) {
+      responseText = `### ${res.briefing.headline}\n\n${res.briefing.summary}`
+    } else {
+      responseText =
+        `### ${res.briefing.headline}\n\n` +
+        `${res.briefing.summary}\n\n` +
+        `**Key Priorities & Recommended Actions:**\n` +
+        res.insights
+          .map(
+            (i) =>
+              `- **[${i.severity.toUpperCase()}] ${i.title}**\n  ${i.description}${
+                i.recommendedAction ? `\n  *Recommended Action:* ${i.recommendedAction}` : ""
+              }`
+          )
+          .join("\n\n")
+    }
+  } else if (
     q.includes("pipeline") ||
     q.includes("deal") ||
     q.includes("negotiation") ||

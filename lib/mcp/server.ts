@@ -6,6 +6,7 @@ import { getTasksTools } from "./tools/tasks"
 import { getActivitiesTools } from "./tools/activities"
 import { getKnowledgeTools } from "./tools/knowledge"
 import { getDashboardTools } from "./tools/dashboard"
+import { getInsightsTools } from "./tools/insights"
 
 /**
  * The MCP Tool Registry.
@@ -23,5 +24,6 @@ export function getMCPTools(context: MCPContext) {
     ...getActivitiesTools(context),
     ...getKnowledgeTools(context),
     ...getDashboardTools(context),
+    ...getInsightsTools(context),
   }
 }

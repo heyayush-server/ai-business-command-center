@@ -12,6 +12,41 @@ vi.mock("@/lib/services/ai-actions.service", () => ({
   createPendingAction: vi.fn().mockResolvedValue({ id: "123", success: true }),
 }))
 
+vi.mock("@/lib/services/insights.service", () => ({
+  getBusinessInsights: vi.fn().mockResolvedValue({
+    briefing: {
+      headline: "1 Critical Item Requiring Immediate Attention",
+      summary: "Today you have 1 overdue task.",
+      keyFindings: ["Overdue Task: Task 1"],
+      metrics: {
+        totalInsights: 1,
+        criticalCount: 1,
+        warningCount: 0,
+        infoCount: 0,
+        overdueTasksCount: 1,
+        staleLeadsCount: 0,
+        staleDealsCount: 0,
+        inactiveCustomersCount: 0,
+      },
+      generatedAt: "2026-09-22T00:00:00.000Z",
+    },
+    insights: [
+      {
+        id: "ins-1",
+        type: "OVERDUE_TASK",
+        severity: "critical",
+        title: "Overdue Task: Task 1",
+        description: "Task is past due.",
+        entityType: "task",
+        entityId: "task-1",
+        recommendedAction: { label: "Complete or reschedule this task" },
+        createdAt: "2026-09-22T00:00:00.000Z",
+      },
+    ],
+    total: 1,
+  }),
+}))
+
 describe("MCP Business Copilot Tools", () => {
   const adminContext: MCPContext = {
     userId: "user-1",
@@ -32,6 +67,7 @@ describe("MCP Business Copilot Tools", () => {
     
     // Check reads
     expect(tools.get_business_summary).toBeDefined()
+    expect(tools.get_business_insights).toBeDefined()
     expect(tools.search_leads).toBeDefined()
     expect(tools.search_customers).toBeDefined()
     expect(tools.search_deals).toBeDefined()
@@ -46,12 +82,28 @@ describe("MCP Business Copilot Tools", () => {
     expect(tools.prepare_update_deal).toBeDefined()
   })
 
+  it("should allow viewers to read proactive business insights", async () => {
+    const tools = getMCPTools(viewerContext)
+    expect(tools.get_business_insights).toBeDefined()
+
+    // @ts-expect-error AI tool execute returns dynamic union
+    const result = (await tools.get_business_insights.execute({ severity: "all", limit: 10, entity_type: "all" }, {})) as {
+      briefing: { headline: string; summary: string }
+      insights: Array<{ title: string; severity: string }>
+      total: number
+    }
+
+    expect(result.briefing.headline).toContain("1 Critical Item")
+    expect(result.insights.length).toBe(1)
+    expect(result.insights[0].title).toContain("Overdue Task")
+  })
+
   it("should prevent viewers from preparing write actions", async () => {
     const tools = getMCPTools(viewerContext)
     
     // Attempt to prepare a task creation
     // @ts-expect-error AI tool execute returns dynamic union
-    const result = (await tools.prepare_create_task.execute({ title: "New Task" }, {}))
+    const result = (await tools.prepare_create_task.execute({ title: "New Task" }, {})) as { error?: string; success?: boolean }
     
     expect(result.error).toContain("Insufficient permissions: viewer accounts cannot prepare write actions")
   })
@@ -61,7 +113,7 @@ describe("MCP Business Copilot Tools", () => {
     
     // Attempt to prepare a task creation
     // @ts-expect-error AI tool execute returns dynamic union
-    const result = (await tools.prepare_create_task.execute({ title: "New Task" }, {}))
+    const result = (await tools.prepare_create_task.execute({ title: "New Task" }, {})) as { error?: string; success?: boolean }
     
     expect(result.error).toBeUndefined()
     expect(result.success).toBe(true)
