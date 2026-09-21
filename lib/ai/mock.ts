@@ -32,7 +32,121 @@ export async function handleMockChat({
   let toolResult: unknown = null
   let responseText = ""
 
-  // ── Route query to the most appropriate tool ──────────────────────────────
+  // ── Route write-action queries to prepare tools (return approval cards) ───
+  // These route to real prepare tools which call createPendingAction with the
+  // real executor — mock mode never bypasses authorization.
+
+  const isWriteQuery =
+    (q.includes("create") || q.includes("add") || q.includes("new") || q.includes("make")) ||
+    (q.includes("complete") || q.includes("finish") || q.includes("done") || q.includes("mark")) ||
+    (q.includes("update") || q.includes("change") || q.includes("modify") || q.includes("edit")) ||
+    (q.includes("log") && (q.includes("call") || q.includes("meeting") || q.includes("note") || q.includes("activity")))
+
+  if (isWriteQuery) {
+    // Determine which prepare tool to call based on entity keyword
+    let prepareToolName: keyof typeof tools | null = null
+    let prepareArgs: Record<string, unknown> = {}
+
+    if (q.includes("task") || q.includes("follow") || q.includes("todo")) {
+      if (q.includes("complete") || q.includes("finish") || q.includes("done") || q.includes("mark")) {
+        // complete_task needs an id — not available in mock, so show create instead
+        prepareToolName = "prepare_create_task"
+        prepareArgs = {
+          title: "Follow-up task",
+          priority: "medium",
+          due_date: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
+        }
+      } else if (q.includes("update") || q.includes("change") || q.includes("modify")) {
+        prepareToolName = "prepare_create_task"
+        prepareArgs = {
+          title: "Updated task",
+          priority: "high",
+        }
+      } else {
+        prepareToolName = "prepare_create_task"
+        prepareArgs = {
+          title: q.includes("follow") ? "Follow-up task" : "New task from AI",
+          priority: "medium",
+          due_date: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
+        }
+      }
+    } else if (q.includes("lead") || q.includes("prospect")) {
+      prepareToolName = "prepare_create_lead"
+      prepareArgs = {
+        first_name: "New",
+        last_name: "Prospect",
+        status: "new",
+      }
+    } else if (q.includes("customer") || q.includes("client")) {
+      prepareToolName = "prepare_create_customer"
+      prepareArgs = {
+        name: "New Customer Account",
+        status: "active",
+      }
+    } else if (q.includes("deal") || q.includes("opportunity")) {
+      // For mock, we can't create a deal without a real customer ID
+      // Fallback to read-only pipeline view
+      prepareToolName = null
+    } else if (q.includes("log") || q.includes("activity") || q.includes("note") || q.includes("call") || q.includes("meeting")) {
+      prepareToolName = "prepare_record_activity"
+      prepareArgs = {
+        entity_type: "general",
+        action: q.includes("call") ? "call" : q.includes("meeting") ? "meeting" : "note",
+        title: q.includes("call") ? "Logged a call" : q.includes("meeting") ? "Meeting recorded" : "Note added",
+        description: "Logged via AI Assistant",
+      }
+    }
+
+    if (prepareToolName && prepareToolName in tools) {
+      toolName = prepareToolName
+      toolArgs = prepareArgs
+      const execute = tools[prepareToolName].execute as unknown as AnyFn
+      try {
+        toolResult = await execute(prepareArgs)
+        if (toolResult && typeof toolResult === "object" && "actionId" in toolResult) {
+          responseText = `I've prepared a **${(toolResult as { preview?: { label?: string } }).preview?.label ?? prepareToolName.replace("prepare_", "")}** action for your review. Please approve or cancel it below.`
+        } else if (toolResult && typeof toolResult === "object" && "error" in toolResult) {
+          responseText = `I couldn't prepare that action: ${(toolResult as { error: string }).error}`
+        } else {
+          responseText = "The action has been prepared. Please review the details below."
+        }
+      } catch (err) {
+        toolResult = null
+        responseText = err instanceof Error
+          ? `Couldn't prepare that action: ${err.message}`
+          : "An error occurred while preparing the action."
+      }
+
+      // Early return with the write-action response
+      const callId = `call_mock_${Date.now()}`
+      const textId = `text_mock_${Date.now()}`
+
+      const stream = createUIMessageStream({
+        execute: async ({ writer }) => {
+          writer.write({ type: "start" })
+          writer.write({ type: "start-step" })
+          writer.write({ type: "tool-input-start", toolCallId: callId, toolName })
+          writer.write({ type: "tool-input-available", toolCallId: callId, toolName, input: toolArgs })
+          writer.write({ type: "tool-output-available", toolCallId: callId, output: toolResult })
+          writer.write({ type: "text-start", id: textId })
+          const words = responseText.split(" ")
+          for (let i = 0; i < words.length; i += 4) {
+            const chunk = words.slice(i, i + 4).join(" ") + (i + 4 < words.length ? " " : "")
+            writer.write({ type: "text-delta", id: textId, delta: chunk })
+          }
+          writer.write({ type: "text-end", id: textId })
+          writer.write({ type: "finish-step" })
+          writer.write({ type: "finish", finishReason: "stop" })
+          if (onFinish) await onFinish(responseText)
+        },
+      })
+
+      return createUIMessageStreamResponse({ stream })
+    }
+  }
+
+  // ── Route query to the most appropriate read-only tool ────────────────────
+
 
   if (
     q.includes("pipeline") ||

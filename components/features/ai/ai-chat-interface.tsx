@@ -16,9 +16,13 @@ import {
   TrendingUp,
   Users,
   Building2,
+  ListTodo,
+  Plus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { AIApprovalCard } from "@/components/features/ai/ai-approval-card"
+import type { AIActionType } from "@/lib/ai/action-definitions"
 
 interface AIChatInterfaceProps {
   organizationName: string
@@ -41,14 +45,68 @@ const SUGGESTED_PROMPTS = [
     icon: <AlertCircle className="h-3.5 w-3.5 text-rose-500" />,
   },
   {
-    label: "Summarize my pipeline",
-    icon: <Building2 className="h-3.5 w-3.5 text-emerald-500" />,
+    label: "Create a follow-up task for tomorrow",
+    icon: <Plus className="h-3.5 w-3.5 text-violet-500" />,
   },
   {
     label: "Which leads are qualified?",
     icon: <Users className="h-3.5 w-3.5 text-blue-500" />,
   },
+  {
+    label: "Summarize my pipeline",
+    icon: <Building2 className="h-3.5 w-3.5 text-emerald-500" />,
+  },
+  {
+    label: "Create a new customer account",
+    icon: <Building2 className="h-3.5 w-3.5 text-teal-500" />,
+  },
+  {
+    label: "Log a call activity",
+    icon: <ListTodo className="h-3.5 w-3.5 text-amber-500" />,
+  },
 ]
+
+// ── Helpers to extract pending actions from message parts ─────────────────────
+
+interface ParsedPendingAction {
+  actionId: string
+  actionType: AIActionType
+  status: string
+  expiresAt: string | null
+  preview: {
+    label: string
+    actionType: AIActionType
+    fields: Array<{ key: string; value: string | null | undefined }>
+  }
+}
+
+function extractPendingActions(message: UIMessage): ParsedPendingAction[] {
+  const actions: ParsedPendingAction[] = []
+  if (!Array.isArray(message.parts)) return actions
+
+  for (const part of message.parts) {
+    // Tool output parts carry the result from the server tool execute fn
+    if (
+      "type" in part &&
+      (part.type === "tool-invocation" || part.type === "tool-result" || part.type === "tool-output")
+    ) {
+      // In AI SDK 7, the tool result is in the part itself or a nested result field
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const output = (part as any).output ?? (part as any).result ?? (part as any).toolResult
+      if (
+        output &&
+        typeof output === "object" &&
+        "actionId" in output &&
+        "actionType" in output &&
+        "preview" in output
+      ) {
+        actions.push(output as ParsedPendingAction)
+      }
+    }
+  }
+
+  return actions
+}
 
 export function AIChatInterface({
   organizationName,
@@ -116,6 +174,10 @@ export function AIChatInterface({
     }
   }
 
+  // Track cards that have been approved/cancelled so we can show inline feedback
+  const [approvedCards, setApprovedCards] = useState<Record<string, string>>({})
+  const [cancelledCards, setCancelledCards] = useState<Set<string>>(new Set())
+
   return (
     <div className="flex flex-col h-[calc(100vh-14rem)] min-h-[500px] rounded-xl border border-border bg-card shadow-2xs overflow-hidden">
       {/* Top Console Bar */}
@@ -130,11 +192,11 @@ export function AIChatInterface({
                 AI Business Assistant
               </h3>
               <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
-                Read-Only
+                Actions Enabled
               </Badge>
             </div>
             <p className="text-[11px] text-muted-foreground truncate">
-              Operating within {organizationName} • Server-isolated tools
+              Operating within {organizationName} • Human approval required for writes
             </p>
           </div>
         </div>
@@ -165,14 +227,14 @@ export function AIChatInterface({
                 Welcome, {userName || "Executive"}
               </h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Ask me questions about {organizationName}&apos;s sales pipeline, qualified leads, customer accounts, operational tasks, or recent activity logs.
+                Ask me questions about {organizationName}&apos;s data, or ask me to create leads, tasks, customers, or deals. Write actions require your approval before executing.
               </p>
             </div>
 
             {/* Suggested Prompts Grid */}
             <div className="w-full space-y-2 pt-2">
               <span className="text-[11px] font-medium text-muted-foreground block text-left">
-                Suggested questions:
+                Try asking:
               </span>
               <div className="grid grid-cols-1 gap-2">
                 {SUGGESTED_PROMPTS.map((prompt) => (
@@ -198,8 +260,7 @@ export function AIChatInterface({
           messages.map((message) => {
             const isUser = message.role === "user"
 
-            // Extract text parts and tool call info from UIMessage.parts
-            // In AI SDK 7, UIMessage has `parts` (not a `content` string)
+            // Extract text parts from UIMessage.parts (SDK 7 — no top-level content)
             let renderedText = ""
             const toolCalls: Array<{ name: string }> = []
 
@@ -218,6 +279,9 @@ export function AIChatInterface({
               }
             }
 
+            // Extract any pending actions from tool outputs
+            const pendingActions = extractPendingActions(message)
+
             return (
               <div
                 key={message.id}
@@ -229,20 +293,14 @@ export function AIChatInterface({
                   </div>
                 )}
 
-                <div
-                  className={`max-w-[85%] sm:max-w-[75%] rounded-2xl p-3.5 text-xs space-y-2 leading-relaxed ${
-                    isUser
-                      ? "bg-primary text-primary-foreground rounded-br-xs"
-                      : "bg-muted/40 border border-border/70 text-foreground rounded-bl-xs shadow-2xs"
-                  }`}
-                >
-                  {/* Tool Invocations Badge */}
-                  {toolCalls.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pb-1 border-b border-border/40">
-                      {toolCalls.map((tc, idx) => (
+                <div className={`max-w-[90%] sm:max-w-[80%] space-y-2 ${isUser ? "items-end" : "items-start"} flex flex-col`}>
+                  {/* Tool call badges (read queries) */}
+                  {!isUser && toolCalls.filter(tc => !tc.name.startsWith("prepare_")).length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {toolCalls.filter(tc => !tc.name.startsWith("prepare_")).map((tc, idx) => (
                         <div
                           key={idx}
-                          className="inline-flex items-center gap-1 rounded bg-background/80 px-2 py-0.5 text-[10px] font-mono border border-border/50 text-muted-foreground"
+                          className="inline-flex items-center gap-1 rounded bg-muted/70 px-2 py-0.5 text-[10px] font-mono border border-border/50 text-muted-foreground"
                         >
                           <Wrench className="h-2.5 w-2.5 text-primary" />
                           <span>Queried: {tc.name}</span>
@@ -251,11 +309,62 @@ export function AIChatInterface({
                     </div>
                   )}
 
-                  {/* Rendered Text */}
-                  <div className="whitespace-pre-wrap font-sans">
-                    {renderedText ||
-                      (isLoading && !isUser ? "Analyzing business data..." : "")}
-                  </div>
+                  {/* Prepare action badges */}
+                  {!isUser && toolCalls.filter(tc => tc.name.startsWith("prepare_")).length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {toolCalls.filter(tc => tc.name.startsWith("prepare_")).map((tc, idx) => (
+                        <div
+                          key={idx}
+                          className="inline-flex items-center gap-1 rounded bg-violet-50 border border-violet-200 px-2 py-0.5 text-[10px] font-mono text-violet-700"
+                        >
+                          <Sparkles className="h-2.5 w-2.5" />
+                          <span>Prepared: {tc.name.replace("prepare_", "")}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Message bubble */}
+                  {(renderedText || (isLoading && !isUser)) && (
+                    <div
+                      className={`rounded-2xl p-3.5 text-xs leading-relaxed ${
+                        isUser
+                          ? "bg-primary text-primary-foreground rounded-br-xs"
+                          : "bg-muted/40 border border-border/70 text-foreground rounded-bl-xs shadow-2xs"
+                      }`}
+                    >
+                      <div className="whitespace-pre-wrap font-sans">
+                        {renderedText ||
+                          (isLoading && !isUser ? "Analyzing your request…" : "")}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Approval cards from tool outputs */}
+                  {!isUser &&
+                    pendingActions.map((action) => {
+                      const wasApproved = approvedCards[action.actionId]
+                      const wasCancelled = cancelledCards.has(action.actionId)
+                      return (
+                        <AIApprovalCard
+                          key={action.actionId}
+                          data={{
+                            ...action,
+                            status: wasCancelled
+                              ? "cancelled"
+                              : wasApproved
+                              ? "executed"
+                              : action.status,
+                          }}
+                          onApproved={(msg) =>
+                            setApprovedCards((prev) => ({ ...prev, [action.actionId]: msg }))
+                          }
+                          onCancelled={() =>
+                            setCancelledCards((prev) => new Set([...prev, action.actionId]))
+                          }
+                        />
+                      )
+                    })}
                 </div>
 
                 {isUser && (
@@ -276,7 +385,7 @@ export function AIChatInterface({
             </div>
             <div className="rounded-2xl rounded-bl-xs bg-muted/40 border border-border/70 p-3 text-xs text-muted-foreground flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
-              <span>Querying organization data...</span>
+              <span>Processing…</span>
             </div>
           </div>
         )}
@@ -318,7 +427,7 @@ export function AIChatInterface({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask about pipeline value, overdue tasks, qualified leads, or recent activities..."
+              placeholder="Ask questions or say 'Create a task…', 'Add a lead…', 'Log a meeting…'"
               rows={1}
               className="w-full resize-none rounded-lg border border-input bg-transparent px-3 py-2 text-xs shadow-2xs placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring min-h-[38px] max-h-24"
             />
@@ -348,8 +457,8 @@ export function AIChatInterface({
           )}
         </form>
         <div className="flex items-center justify-between pt-2 px-1 text-[10px] text-muted-foreground">
-          <span>Press Enter to send, Shift+Enter for new line</span>
-          <span>Read-only assistant • Real database queries</span>
+          <span>Enter to send, Shift+Enter for new line</span>
+          <span>Write actions require approval • Data stays in your org</span>
         </div>
       </div>
     </div>
