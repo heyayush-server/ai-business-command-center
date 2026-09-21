@@ -16,6 +16,8 @@ import {
   Activity,
   FileText,
   CheckCircle2,
+  Sparkles,
+  ExternalLink,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
@@ -24,6 +26,7 @@ import { Separator } from "@/components/ui/separator"
 import { LeadStatusBadge } from "./lead-status-badge"
 import { EditLeadDialog } from "./edit-lead-dialog"
 import { DeleteLeadDialog } from "./delete-lead-dialog"
+import { ConvertLeadDialog } from "./convert-lead-dialog"
 import {
   updateLeadStatusAction,
   assignLeadAction,
@@ -58,6 +61,10 @@ export function LeadDetailView({
   const [isPending, startTransition] = useTransition()
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [convertOpen, setConvertOpen] = useState(false)
+
+  const leadMetadata = (lead.metadata || {}) as Record<string, unknown>
+  const convertedCustomerId = leadMetadata.converted_to_customer_id as string | undefined
 
   const isArchived = Boolean(lead.deleted_at)
   const fullName =
@@ -137,6 +144,27 @@ export function LeadDetailView({
 
         {/* Top actions */}
         <div className="flex items-center gap-2">
+          {convertedCustomerId ? (
+            <Link
+              href={`/customers/${convertedCustomerId}`}
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Converted Account</span>
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+          ) : (
+            <Button
+              size="sm"
+              onClick={() => setConvertOpen(true)}
+              disabled={isArchived}
+              className="h-8 gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Convert to Customer</span>
+            </Button>
+          )}
+
           <Button
             variant="outline"
             size="sm"
@@ -409,6 +437,14 @@ export function LeadDetailView({
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         onSuccess={() => router.refresh()}
+      />
+
+      {/* Convert Lead to Customer Dialog */}
+      <ConvertLeadDialog
+        lead={lead}
+        members={members}
+        open={convertOpen}
+        onOpenChange={setConvertOpen}
       />
     </div>
   )

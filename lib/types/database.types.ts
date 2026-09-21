@@ -189,7 +189,10 @@ export interface Database {
           primary_contact_email: string | null
           primary_contact_phone: string | null
           website: string | null
+          assigned_to: string | null
+          converted_from_lead_id: string | null
           metadata: Json | null
+          deleted_at: string | null
           created_at: string
           updated_at: string
         }
@@ -203,7 +206,10 @@ export interface Database {
           primary_contact_email?: string | null
           primary_contact_phone?: string | null
           website?: string | null
+          assigned_to?: string | null
+          converted_from_lead_id?: string | null
           metadata?: Json | null
+          deleted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -217,7 +223,10 @@ export interface Database {
           primary_contact_email?: string | null
           primary_contact_phone?: string | null
           website?: string | null
+          assigned_to?: string | null
+          converted_from_lead_id?: string | null
           metadata?: Json | null
+          deleted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -227,6 +236,20 @@ export interface Database {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_converted_from_lead_id_fkey"
+            columns: ["converted_from_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
             referencedColumns: ["id"]
           }
         ]
