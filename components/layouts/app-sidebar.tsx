@@ -18,6 +18,7 @@ import {
   ChevronsUpDown,
   Building,
   Check,
+  BookOpen,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
@@ -72,6 +73,12 @@ export const NAV_ITEMS = [
     href: "/ai",
     icon: Bot,
     badge: "AI 7.0",
+  },
+  {
+    title: "Knowledge Base",
+    href: "/knowledge",
+    icon: BookOpen,
+    badge: null,
   },
   {
     title: "Settings",

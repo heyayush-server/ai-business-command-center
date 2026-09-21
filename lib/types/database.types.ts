@@ -12,9 +12,10 @@ export type CustomerStatus = "active" | "inactive" | "churned"
 export type DealStage = "discovery" | "proposal" | "negotiation" | "closed_won" | "closed_lost"
 export type TaskStatus = "todo" | "in_progress" | "done" | "cancelled"
 export type TaskPriority = "low" | "medium" | "high" | "urgent"
-export type PendingActionStatus = "pending" | "approved" | "rejected" | "expired"
+export type PendingActionStatus = "pending" | "approved" | "rejected" | "expired" | "executed" | "failed" | "cancelled"
 export type ActorType = "user" | "ai"
 export type MessageRole = "user" | "assistant" | "system" | "tool"
+export type KnowledgeDocumentStatus = "pending" | "processing" | "processed" | "failed"
 
 export interface Database {
   public: {
@@ -577,6 +578,8 @@ export interface Database {
           approved_at: string | null
           executed_at: string | null
           execution_result: Json | null
+          expires_at: string | null
+          cancelled_at: string | null
         }
         Insert: {
           id?: string
@@ -591,6 +594,8 @@ export interface Database {
           approved_at?: string | null
           executed_at?: string | null
           execution_result?: Json | null
+          expires_at?: string | null
+          cancelled_at?: string | null
         }
         Update: {
           id?: string
@@ -605,6 +610,8 @@ export interface Database {
           approved_at?: string | null
           executed_at?: string | null
           execution_result?: Json | null
+          expires_at?: string | null
+          cancelled_at?: string | null
         }
         Relationships: [
           {
@@ -660,12 +667,136 @@ export interface Database {
           }
         ]
       }
+      knowledge_documents: {
+        Row: {
+          id: string
+          organization_id: string
+          uploaded_by: string
+          filename: string
+          title: string | null
+          mime_type: string
+          file_size: number
+          storage_path: string
+          status: KnowledgeDocumentStatus
+          error_message: string | null
+          created_at: string
+          updated_at: string
+          deleted_at: string | null
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          uploaded_by: string
+          filename: string
+          title?: string | null
+          mime_type: string
+          file_size: number
+          storage_path: string
+          status?: KnowledgeDocumentStatus
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          uploaded_by?: string
+          filename?: string
+          title?: string | null
+          mime_type?: string
+          file_size?: number
+          storage_path?: string
+          status?: KnowledgeDocumentStatus
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+          deleted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      knowledge_chunks: {
+        Row: {
+          id: string
+          organization_id: string
+          document_id: string
+          content: string
+          chunk_index: number
+          embedding: string
+          metadata: Json | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          document_id: string
+          content: string
+          chunk_index: number
+          embedding: string
+          metadata?: Json | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          document_id?: string
+          content?: string
+          chunk_index?: number
+          embedding?: string
+          metadata?: Json | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_chunks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_documents"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      match_knowledge_chunks: {
+        Args: {
+          query_embedding: string
+          match_count?: number
+          p_organization_id?: string
+        }
+        Returns: {
+          id: string
+          document_id: string
+          content: string
+          metadata: Json
+          similarity: number
+        }[]
+      }
     }
     Enums: {
       member_role: MemberRole
@@ -677,6 +808,7 @@ export interface Database {
       pending_action_status: PendingActionStatus
       actor_type: ActorType
       message_role: MessageRole
+      knowledge_document_status: KnowledgeDocumentStatus
     }
     CompositeTypes: {
       [_ in never]: never
