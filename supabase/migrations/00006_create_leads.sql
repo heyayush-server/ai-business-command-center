@@ -12,7 +12,9 @@ CREATE TABLE public.leads (
   status public.lead_status NOT NULL DEFAULT 'new',
   source TEXT,
   assigned_to UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  notes TEXT,
   metadata JSONB DEFAULT '{}'::jsonb,
+  deleted_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

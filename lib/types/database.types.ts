@@ -121,7 +121,9 @@ export interface Database {
           status: LeadStatus
           source: string | null
           assigned_to: string | null
+          notes: string | null
           metadata: Json | null
+          deleted_at: string | null
           created_at: string
           updated_at: string
         }
@@ -136,7 +138,9 @@ export interface Database {
           status?: LeadStatus
           source?: string | null
           assigned_to?: string | null
+          notes?: string | null
           metadata?: Json | null
+          deleted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -151,7 +155,9 @@ export interface Database {
           status?: LeadStatus
           source?: string | null
           assigned_to?: string | null
+          notes?: string | null
           metadata?: Json | null
+          deleted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -161,6 +167,13 @@ export interface Database {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]
@@ -364,6 +377,13 @@ export interface Database {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]

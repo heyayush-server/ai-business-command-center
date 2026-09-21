@@ -1,4 +1,5 @@
 import React from "react"
+import Link from "next/link"
 import { Users, ArrowUpRight } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { MOCK_LEAD_CONVERSION } from "@/lib/mock/dashboard-data"
@@ -43,9 +44,9 @@ export function LeadConversionChart() {
 
         <div className="pt-2 border-t border-border/60 flex items-center justify-between text-[11px] text-muted-foreground">
           <span>Overall conversion rate: 33.8%</span>
-          <a href="/leads" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">
+          <Link href="/leads" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">
             Manage Leads <ArrowUpRight className="h-3 w-3" />
-          </a>
+          </Link>
         </div>
       </CardContent>
     </Card>

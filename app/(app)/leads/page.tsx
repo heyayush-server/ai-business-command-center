@@ -1,36 +1,76 @@
-import React from "react"
-import { Users, Plus, Upload } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import React, { Suspense } from "react"
+import { redirect } from "next/navigation"
+import { getCurrentOrganization } from "@/lib/auth/getCurrentOrganization"
+import { getLeads, getOrganizationMembers } from "@/lib/services/leads.service"
+import { leadFilterSchema } from "@/lib/validations/lead.schema"
 import { PageHeader } from "@/components/shared/page-header"
-import { EmptyState } from "@/components/shared/empty-state"
+import { LeadsFilters } from "@/components/features/leads/leads-filters"
+import { LeadsTable } from "@/components/features/leads/leads-table"
+import { CreateLeadDialog } from "@/components/features/leads/create-lead-dialog"
+import { Skeleton } from "@/components/ui/skeleton"
 
-export default function LeadsPage() {
+interface LeadsPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function LeadsPage({ searchParams }: LeadsPageProps) {
+  const currentOrg = await getCurrentOrganization()
+
+  if (!currentOrg) {
+    redirect("/onboarding")
+  }
+
+  const rawParams = await searchParams
+
+  const filterParams = leadFilterSchema.parse({
+    search: typeof rawParams.search === "string" ? rawParams.search : undefined,
+    status: typeof rawParams.status === "string" ? rawParams.status : undefined,
+    source: typeof rawParams.source === "string" ? rawParams.source : undefined,
+    assigned_to:
+      typeof rawParams.assigned_to === "string"
+        ? rawParams.assigned_to
+        : undefined,
+    sortBy:
+      typeof rawParams.sortBy === "string" ? rawParams.sortBy : undefined,
+    sortOrder:
+      typeof rawParams.sortOrder === "string" ? rawParams.sortOrder : undefined,
+    page: rawParams.page,
+    pageSize: rawParams.pageSize,
+    includeDeleted: rawParams.includeDeleted,
+  })
+
+  const [leadsResult, members] = await Promise.all([
+    getLeads(filterParams, currentOrg.organizationId),
+    getOrganizationMembers(currentOrg.organizationId),
+  ])
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Leads Management"
-        description="Capture, qualify, and track prospective customer relationships across all acquisition channels."
-        action={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-1 text-xs h-8">
-              <Upload className="h-3.5 w-3.5" />
-              <span>Import CSV</span>
-            </Button>
-            <Button size="sm" className="gap-1 text-xs h-8">
-              <Plus className="h-3.5 w-3.5" />
-              <span>Create Lead</span>
-            </Button>
-          </div>
-        }
+        description={`Capture, qualify, and track prospective customer relationships in ${currentOrg.organizationName}.`}
+        action={<CreateLeadDialog members={members} />}
       />
 
-      <EmptyState
-        icon={<Users className="h-6 w-6" />}
-        title="Leads Database Module"
-        description="Leads CRUD, automated status workflows, and AI qualification scoring will be connected to Supabase in Phase 2."
-        actionLabel="Return to Command Center"
-        actionHref="/dashboard"
-      />
+      <Suspense
+        fallback={
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full rounded-md" />
+            <Skeleton className="h-64 w-full rounded-md" />
+          </div>
+        }
+      >
+        <LeadsFilters members={members} />
+
+        <LeadsTable
+          leads={leadsResult.leads}
+          total={leadsResult.total}
+          page={leadsResult.page}
+          pageSize={leadsResult.pageSize}
+          totalPages={leadsResult.totalPages}
+          members={members}
+        />
+      </Suspense>
     </div>
   )
 }
