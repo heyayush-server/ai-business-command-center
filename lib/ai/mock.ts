@@ -1,8 +1,9 @@
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai"
-import { getAITools, type AIServerContext } from "@/lib/ai/tools"
+import { getMCPTools } from "@/lib/mcp/server"
+import type { MCPContext } from "@/lib/mcp/context"
 
 interface MockChatParams {
-  serverContext: AIServerContext
+  serverContext: MCPContext
   userQuery: string
   onFinish?: (fullText: string) => Promise<void>
 }
@@ -24,7 +25,7 @@ export async function handleMockChat({
   userQuery,
   onFinish,
 }: MockChatParams): Promise<Response> {
-  const tools = getAITools(serverContext)
+  const tools = getMCPTools(serverContext)
   const q = userQuery.toLowerCase()
 
   let toolName = "get_business_summary"

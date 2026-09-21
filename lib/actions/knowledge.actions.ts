@@ -24,6 +24,7 @@ export async function uploadDocumentAction(formData: FormData) {
     
     revalidatePath("/knowledge")
     return { success: true }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return { success: false, error: error.message }
   }
@@ -41,6 +42,7 @@ export async function deleteDocumentAction(documentId: string) {
     
     revalidatePath("/knowledge")
     return { success: true }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     return { success: false, error: error.message }
   }

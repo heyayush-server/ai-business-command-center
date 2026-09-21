@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect } from "vitest"
 import { generateMockEmbedding } from "../lib/services/embeddings.service"
 
 describe("Embeddings Service - Mock Mode", () => {

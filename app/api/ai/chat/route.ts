@@ -1,7 +1,8 @@
 import { streamText, convertToModelMessages, isStepCount, type UIMessage } from "ai"
 import { getUser } from "@/lib/auth/getUser"
 import { getCurrentOrganization } from "@/lib/auth/getCurrentOrganization"
-import { getAITools, type AIServerContext } from "@/lib/ai/tools"
+import { getMCPTools } from "@/lib/mcp/server"
+import type { MCPContext } from "@/lib/mcp/context"
 import { getAIModel, getModelId, isAIMockMode } from "@/lib/ai/provider"
 import { buildSystemPrompt } from "@/lib/ai/prompts/system"
 import { handleMockChat } from "@/lib/ai/mock"
@@ -79,10 +80,11 @@ export async function POST(req: Request) {
     }
 
     // 5. Server-injected trusted security context
-    const serverContext: AIServerContext = {
+    const mcpContext: MCPContext = {
       organizationId: currentOrg.organizationId,
       userId: user.id,
-      userRole: currentOrg.userRole,
+      role: currentOrg.userRole,
+      conversationId,
     }
 
     // 6. Manage conversation record
@@ -106,7 +108,7 @@ export async function POST(req: Request) {
     // 7. Mock mode execution (AI_MODE=mock or missing provider keys)
     if (isAIMockMode()) {
       return await handleMockChat({
-        serverContext,
+        serverContext: mcpContext,
         userQuery: lastUserText,
         onFinish: async (fullText) => {
           await saveAIMessage({
@@ -143,7 +145,7 @@ export async function POST(req: Request) {
         today: new Date().toISOString().slice(0, 10),
       }),
       messages: modelMessages,
-      tools: getAITools(serverContext),
+      tools: getMCPTools(mcpContext),
       stopWhen: isStepCount(5),
       onFinish: async ({ text, usage }) => {
         if (text) {

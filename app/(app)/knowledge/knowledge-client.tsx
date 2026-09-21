@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Trash2, FileUp, Loader2 } from "lucide-react"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function KnowledgeClient({ initialDocuments }: { initialDocuments: any[] }) {
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -26,8 +27,9 @@ export function KnowledgeClient({ initialDocuments }: { initialDocuments: any[] 
       if (!result.success) {
         setError(result.error || "Failed to upload document")
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred")
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setError((error as Error).message || "An unexpected error occurred")
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) {

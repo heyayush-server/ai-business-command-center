@@ -78,6 +78,7 @@ export async function uploadAndProcessDocument({ organizationId, userId, file }:
     let extractedText = ""
 
     if (file.type === "application/pdf") {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const pdfParse = require("pdf-parse")
       const pdfData = await pdfParse(buffer)
       extractedText = pdfData.text
@@ -127,6 +128,7 @@ export async function uploadAndProcessDocument({ organizationId, userId, file }:
       .update({ status: "processed" })
       .eq("id", documentId)
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     // 7. Mark as failed if error occurs
     await supabase
