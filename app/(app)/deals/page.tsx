@@ -1,36 +1,76 @@
-import React from "react"
-import { TrendingUp, Plus, Filter } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { PageHeader } from "@/components/shared/page-header"
-import { EmptyState } from "@/components/shared/empty-state"
+import React, { Suspense } from "react"
+import { redirect } from "next/navigation"
+import { getCurrentOrganization } from "@/lib/auth/getCurrentOrganization"
+import {
+  getDeals,
+  getDealsForKanban,
+  getCustomerOptions,
+} from "@/lib/services/deals.service"
+import { getOrganizationMembers } from "@/lib/services/leads.service"
+import { dealFilterSchema } from "@/lib/validations/deal.schema"
+import { DealsClientView } from "@/components/features/deals/deals-client-view"
+import { Skeleton } from "@/components/ui/skeleton"
 
-export default function DealsPage() {
+interface DealsPageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function DealsPage({ searchParams }: DealsPageProps) {
+  const currentOrg = await getCurrentOrganization()
+
+  if (!currentOrg) {
+    redirect("/onboarding")
+  }
+
+  const rawParams = await searchParams
+
+  const filterParams = dealFilterSchema.parse({
+    search: typeof rawParams.search === "string" ? rawParams.search : undefined,
+    stage: typeof rawParams.stage === "string" ? rawParams.stage : undefined,
+    customer_id:
+      typeof rawParams.customer_id === "string"
+        ? rawParams.customer_id
+        : undefined,
+    assigned_to:
+      typeof rawParams.assigned_to === "string"
+        ? rawParams.assigned_to
+        : undefined,
+    sortBy:
+      typeof rawParams.sortBy === "string" ? rawParams.sortBy : undefined,
+    sortOrder:
+      typeof rawParams.sortOrder === "string" ? rawParams.sortOrder : undefined,
+    page: rawParams.page,
+    pageSize: rawParams.pageSize,
+    includeDeleted: rawParams.includeDeleted,
+  })
+
+  const [pipelineData, dealsResult, customers, members] = await Promise.all([
+    getDealsForKanban(currentOrg.organizationId, {
+      search: filterParams.search,
+      customer_id: filterParams.customer_id,
+      assigned_to: filterParams.assigned_to,
+      includeDeleted: filterParams.includeDeleted,
+    }),
+    getDeals(filterParams, currentOrg.organizationId),
+    getCustomerOptions(currentOrg.organizationId),
+    getOrganizationMembers(currentOrg.organizationId),
+  ])
+
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Deals &amp; Revenue Pipeline"
-        description="Kanban pipeline boards, probability weighting, expected close dates, and contract values."
-        action={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-1 text-xs h-8">
-              <Filter className="h-3.5 w-3.5" />
-              <span>Filter</span>
-            </Button>
-            <Button size="sm" className="gap-1 text-xs h-8">
-              <Plus className="h-3.5 w-3.5" />
-              <span>New Deal</span>
-            </Button>
-          </div>
-        }
+    <Suspense
+      fallback={
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-full rounded-md" />
+          <Skeleton className="h-96 w-full rounded-md" />
+        </div>
+      }
+    >
+      <DealsClientView
+        pipelineData={pipelineData}
+        dealsResult={dealsResult}
+        customers={customers}
+        members={members}
       />
-
-      <EmptyState
-        icon={<TrendingUp className="h-6 w-6" />}
-        title="Pipeline &amp; Deal Flow"
-        description="Interactive drag-and-drop Kanban pipeline boards and deal stage velocity analytics will be implemented in Phase 3."
-        actionLabel="Return to Command Center"
-        actionHref="/dashboard"
-      />
-    </div>
+    </Suspense>
   )
 }

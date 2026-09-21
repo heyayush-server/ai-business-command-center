@@ -260,11 +260,16 @@ export interface Database {
           organization_id: string
           customer_id: string | null
           name: string
+          title: string
           value: number
+          currency: string
           stage: DealStage
           probability: number
+          expected_close: string | null
           expected_close_date: string | null
           assigned_to: string | null
+          notes: string | null
+          deleted_at: string | null
           created_at: string
           updated_at: string
         }
@@ -272,12 +277,17 @@ export interface Database {
           id?: string
           organization_id: string
           customer_id?: string | null
-          name: string
+          name?: string
+          title: string
           value?: number
+          currency?: string
           stage?: DealStage
           probability?: number
+          expected_close?: string | null
           expected_close_date?: string | null
           assigned_to?: string | null
+          notes?: string | null
+          deleted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -286,11 +296,16 @@ export interface Database {
           organization_id?: string
           customer_id?: string | null
           name?: string
+          title?: string
           value?: number
+          currency?: string
           stage?: DealStage
           probability?: number
+          expected_close?: string | null
           expected_close_date?: string | null
           assigned_to?: string | null
+          notes?: string | null
+          deleted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -300,6 +315,20 @@ export interface Database {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]

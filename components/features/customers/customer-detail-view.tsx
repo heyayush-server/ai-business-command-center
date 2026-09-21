@@ -30,7 +30,10 @@ import {
   updateCustomerStatusAction,
   assignCustomerAction,
 } from "@/lib/actions/customers.actions"
+import { DealStageBadge } from "@/components/features/deals/deal-stage-badge"
+import { CreateDealDialog } from "@/components/features/deals/create-deal-dialog"
 import type { CustomerWithDetails } from "@/lib/services/customers.service"
+import type { DealWithDetails } from "@/lib/services/deals.service"
 import type { OrganizationMemberOption } from "@/lib/services/leads.service"
 import type { ActivityWithActor } from "@/lib/services/activities.service"
 import type { CustomerStatus } from "@/lib/types/database.types"
@@ -39,6 +42,7 @@ interface CustomerDetailViewProps {
   customer: CustomerWithDetails
   members: OrganizationMemberOption[]
   activities: ActivityWithActor[]
+  deals?: DealWithDetails[]
 }
 
 const STATUS_OPTIONS: { status: CustomerStatus; label: string }[] = [
@@ -51,6 +55,7 @@ export function CustomerDetailView({
   customer,
   members,
   activities,
+  deals: propDeals,
 }: CustomerDetailViewProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -100,7 +105,7 @@ export function CustomerDetailView({
     }
   }
 
-  const deals = customer.deals || []
+  const deals = propDeals || customer.deals || []
   const totalPipelineValue = deals.reduce((sum, d) => sum + Number(d.value || 0), 0)
 
   return (
@@ -348,18 +353,25 @@ export function CustomerDetailView({
           {/* Linked Deals Section */}
           <Card className="border-border">
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-primary" />
-                <span>Associated Deals</span>
+                <span className="text-sm font-semibold">Associated Deals</span>
                 <Badge variant="outline" className="text-[11px] ml-1.5">
                   {deals.length}
                 </Badge>
-              </CardTitle>
-              {totalPipelineValue > 0 && (
-                <span className="text-xs font-semibold text-emerald-500">
-                  Total Value: ${totalPipelineValue.toLocaleString()}
-                </span>
-              )}
+              </div>
+              <div className="flex items-center gap-3">
+                {totalPipelineValue > 0 && (
+                  <span className="text-xs font-semibold text-emerald-500">
+                    Total: ${totalPipelineValue.toLocaleString()}
+                  </span>
+                )}
+                <CreateDealDialog
+                  customers={[{ id: customer.id, name: customer.name }]}
+                  members={members}
+                  defaultCustomerId={customer.id}
+                />
+              </div>
             </CardHeader>
             <CardContent className="text-xs">
               {deals.length === 0 ? (
@@ -369,23 +381,44 @@ export function CustomerDetailView({
                 </div>
               ) : (
                 <div className="divide-y divide-border">
-                  {deals.map((deal) => (
-                    <div
-                      key={deal.id}
-                      className="py-2.5 flex items-center justify-between gap-3"
-                    >
-                      <div>
-                        <p className="font-medium text-foreground">{deal.name}</p>
-                        <span className="text-[11px] text-muted-foreground capitalize">
-                          Stage: {deal.stage.replace("_", " ")} • Probability:{" "}
-                          {deal.probability}%
+                  {deals.map((deal) => {
+                    const title = (deal as { title?: string }).title || deal.name
+                    const expectedClose = (deal as { expected_close?: string | null }).expected_close
+                    return (
+                      <div
+                        key={deal.id}
+                        className="py-2.5 flex items-center justify-between gap-3 hover:bg-muted/30 px-1 rounded transition-colors"
+                      >
+                        <div className="min-w-0">
+                          <Link
+                            href={`/deals/${deal.id}`}
+                            className="font-medium text-foreground hover:text-primary hover:underline truncate block"
+                          >
+                            {title}
+                          </Link>
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-muted-foreground">
+                            <DealStageBadge stage={deal.stage} />
+                            {expectedClose && (
+                              <span>
+                                Target:{" "}
+                                {new Date(expectedClose).toLocaleDateString(
+                                  undefined,
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  }
+                                )}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <span className="font-semibold text-foreground shrink-0">
+                          ${Number(deal.value).toLocaleString()}
                         </span>
                       </div>
-                      <span className="font-semibold text-foreground">
-                        ${Number(deal.value).toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </CardContent>

@@ -1,19 +1,19 @@
 import React from "react"
 import { notFound, redirect } from "next/navigation"
 import { getCurrentOrganization } from "@/lib/auth/getCurrentOrganization"
-import { getCustomerById } from "@/lib/services/customers.service"
+import {
+  getDealById,
+  getCustomerOptions,
+} from "@/lib/services/deals.service"
 import { getOrganizationMembers } from "@/lib/services/leads.service"
 import { getEntityActivities } from "@/lib/services/activities.service"
-import { getDealsByCustomerId } from "@/lib/services/deals.service"
-import { CustomerDetailView } from "@/components/features/customers/customer-detail-view"
+import { DealDetailView } from "@/components/features/deals/deal-detail-view"
 
-interface CustomerDetailPageProps {
+interface DealDetailPageProps {
   params: Promise<{ id: string }>
 }
 
-export default async function CustomerDetailPage({
-  params,
-}: CustomerDetailPageProps) {
+export default async function DealDetailPage({ params }: DealDetailPageProps) {
   const currentOrg = await getCurrentOrganization()
 
   if (!currentOrg) {
@@ -29,24 +29,24 @@ export default async function CustomerDetailPage({
     notFound()
   }
 
-  const customer = await getCustomerById(id, currentOrg.organizationId)
+  const deal = await getDealById(id, currentOrg.organizationId)
 
-  if (!customer) {
+  if (!deal) {
     notFound()
   }
 
-  const [members, activities, deals] = await Promise.all([
+  const [customers, members, activities] = await Promise.all([
+    getCustomerOptions(currentOrg.organizationId),
     getOrganizationMembers(currentOrg.organizationId),
-    getEntityActivities(currentOrg.organizationId, "customer", id),
-    getDealsByCustomerId(id, currentOrg.organizationId),
+    getEntityActivities(currentOrg.organizationId, "deal", id),
   ])
 
   return (
-    <CustomerDetailView
-      customer={customer}
+    <DealDetailView
+      deal={deal}
+      customers={customers}
       members={members}
       activities={activities}
-      deals={deals}
     />
   )
 }

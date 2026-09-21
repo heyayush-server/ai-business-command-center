@@ -1,4 +1,5 @@
 import React from "react"
+import Link from "next/link"
 import { BarChart3, ChevronRight } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -75,9 +76,9 @@ export function SalesPipelineChart() {
 
         <div className="flex items-center justify-between pt-1 text-[11px] text-muted-foreground">
           <span>Target Close Window: Next 30–60 Days</span>
-          <a href="/deals" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">
+          <Link href="/deals" className="inline-flex items-center gap-1 font-medium text-primary hover:underline">
             View full pipeline board <ChevronRight className="h-3 w-3" />
-          </a>
+          </Link>
         </div>
       </CardContent>
     </Card>
