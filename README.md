@@ -327,4 +327,4 @@ npm run build
 ---
 
 ## 📄 License
-Portfolio and engineering learning project by Ishan Sharma.
+Portfolio and engineering learning project by Ayush Singh 
