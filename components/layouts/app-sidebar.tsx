@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { signOut } from "@/lib/actions/auth"
 import {
   LayoutDashboard,
   Users,
@@ -235,9 +236,12 @@ export function AppSidebar({ className, onNavigate }: AppSidebarProps) {
             <DropdownMenuItem className="text-xs">
               <Link href="/settings" className="w-full">API &amp; AI Keys</Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-xs text-destructive">
-              <Link href="/" className="w-full">Sign Out (Demo)</Link>
+            <DropdownMenuItem className="text-xs text-destructive p-0">
+              <form action={signOut} className="w-full">
+                <button type="submit" className="w-full text-left px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10 cursor-pointer rounded-sm">
+                  Sign Out
+                </button>
+              </form>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
