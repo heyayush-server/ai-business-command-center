@@ -74,6 +74,7 @@ Interactive Approval Card Rendered in Chat / UI
 
 ### 1. Interactive Product Experience & Sandbox (Phase 15)
 - **Live In-Browser Simulation**: Prospective users can interact with a live simulated Command Center directly on the landing page (Dashboard ➔ Copilot ➔ Insight ➔ Staged Action ➔ Human Approval).
+- **Dedicated No-Login Demo Route**: `/demo` provides an isolated product tour with simulated dashboard, CRM, RAG, AI Copilot, and approval workflows. It does not read private workspace data and does not call production mutation APIs.
 - **Safe Client Sandbox**: The landing page demo operates in an isolated client state with zero real database mutations or API token costs.
 - **3D Mouse Parallax & Scroll Storytelling**: Subtle pointer tilt dynamics on desktop and responsive step-by-step narrative guiding users from fragmented silos to supervised intelligence.
 
@@ -284,6 +285,14 @@ npm run lint
 # Build production bundle
 npm run build
 ```
+
+### Current Verification Notes
+
+- `IMPLEMENTED`: `/demo` no-login product tour using deterministic local sample data.
+- `IMPLEMENTED`: Login screen includes an "Explore Demo - No Login Required" CTA.
+- `VERIFIED`: The demo route is not listed as a protected route in `proxy.ts` and uses static/mock data imports rather than Supabase organization queries.
+- `FIXED`: Added migration `00025_harden_knowledge_rpc.sql` to require explicit authorized organization context for `match_knowledge_chunks`.
+- `NOT VERIFIED IN THIS PASS`: Live Supabase auth, live Gemini calls, and live RAG ingestion/retrieval require reachable credentials and browser QA.
 
 ---
 

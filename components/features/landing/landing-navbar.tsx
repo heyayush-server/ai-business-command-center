@@ -78,13 +78,13 @@ export function LandingNavbar() {
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/demo"
             className={buttonVariants({
               size: "sm",
               className: "gap-1.5 shadow-xs font-medium text-xs h-8 px-3.5",
             })}
           >
-            <span>Try the Command Center</span>
+            <span>Explore Demo</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
 
@@ -141,10 +141,10 @@ export function LandingNavbar() {
           </nav>
           <div className="pt-2 border-t border-border flex items-center justify-between">
             <Link
-              href="/login"
+              href="/demo"
               className={buttonVariants({ variant: "outline", size: "sm", className: "w-full text-xs" })}
             >
-              Sign In to Workspace
+              Explore Demo
             </Link>
           </div>
         </div>

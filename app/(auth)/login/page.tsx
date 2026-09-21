@@ -3,8 +3,9 @@
 import * as React from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { ArrowRight, Loader2, AlertCircle } from "lucide-react"
+import { ArrowRight, Loader2, AlertCircle, PlayCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -154,6 +155,28 @@ export default function LoginPage() {
           )}
           <span>Sign in with Google</span>
         </Button>
+
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-0.5">
+              <p className="text-xs font-semibold text-foreground">Explore Demo - No Login Required</p>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                Open an isolated workspace with simulated CRM, knowledge, AI, and approval workflows.
+              </p>
+            </div>
+            <Link
+              href="/demo"
+              className={buttonVariants({
+                variant: "secondary",
+                size: "sm",
+                className: "h-8 shrink-0 gap-1.5 text-xs",
+              })}
+            >
+              <PlayCircle className="h-3.5 w-3.5" />
+              <span>Launch Demo</span>
+            </Link>
+          </div>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-center text-xs text-muted-foreground border-t pt-4">
         <span>Don&apos;t have an account yet? </span>

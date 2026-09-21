@@ -28,6 +28,8 @@ The AI Business Command Center is engineered with defense-in-depth security prin
 | Middleware Route Guard | Proxy Route Protection (`proxy.ts`) | `VERIFIED` | Unauthenticated requests redirected before executing protected components. |
 | Server Action Boundaries | Isolated Server Actions (`'use server'`) | `VERIFIED` | Server actions independently re-validate authenticated identity; no reliance on middleware headers alone. |
 | Dev Fallback Security | Local Mock Authentication | `FIXED` | Dev mock session uses separate `dev_session` cookie; isolated strictly to non-production/placeholder environments. |
+| No-Login Demo Boundary | Dedicated `/demo` route | `IMPLEMENTED` | The route uses deterministic local sample data, is intentionally outside protected app routing, and does not execute production mutations. |
+| RAG RPC Guard | `match_knowledge_chunks` organization authorization | `FIXED` | Migration `00025_harden_knowledge_rpc.sql` rejects missing org context, checks membership in the RPC, matches both chunk and document tenant IDs, and caps result count. |
 
 ---
 
@@ -102,3 +104,4 @@ The AI Business Command Center is engineered with defense-in-depth security prin
 
 1. **Client-Side AI Stream Cancellation:** In the event of a lost WebSocket/SSE client connection mid-stream, pending AI token usage is estimated from received chunks rather than exact final model usage.
 2. **Local Development Mock Mode:** When operating with placeholder credentials, simulated CRM data is supplied to avoid network failures; live production deployments require verified Supabase PostgreSQL credentials.
+3. **Verification Scope:** The September 2026 desktop pass implemented and statically verified the no-login demo boundary. Live Supabase auth, Gemini runtime calls, and RAG ingestion/retrieval must be re-verified against a configured environment before being marked as live-verified for a deployment.

@@ -7,6 +7,8 @@
  */
 
 import { describe, it, expect, vi } from "vitest"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
 
 vi.mock("server-only", () => ({}))
 
@@ -117,5 +119,20 @@ describe("Security Regression — Environment & Provider Secrets Safeguards", ()
     if (prevKey) process.env.GEMINI_API_KEY = prevKey
     if (prevMode) process.env.AI_MODE = prevMode
     if (prevProvider) process.env.AI_PROVIDER = prevProvider
+  })
+})
+
+describe("Security Regression — RAG RPC Authorization Contract", () => {
+  it("hardens match_knowledge_chunks against missing or unauthorized organization context", () => {
+    const migration = readFileSync(
+      join(process.cwd(), "supabase", "migrations", "00025_harden_knowledge_rpc.sql"),
+      "utf-8"
+    )
+
+    expect(migration).toContain("security invoker")
+    expect(migration).toContain("p_organization_id is null")
+    expect(migration).toContain("private.has_organization_role")
+    expect(migration).toContain("kd.organization_id = p_organization_id")
+    expect(migration).toContain("limit least(greatest(match_count, 1), 20)")
   })
 })
