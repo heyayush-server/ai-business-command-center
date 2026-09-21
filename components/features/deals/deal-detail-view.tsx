@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   FileText,
   Clock,
-  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +28,7 @@ import {
   changeDealStageAction,
   assignDealAction,
 } from "@/lib/actions/deals.actions"
+import { ActivityTimeline } from "@/components/features/activities/activity-timeline"
 import type { DealWithDetails } from "@/lib/services/deals.service"
 import type { OrganizationMemberOption } from "@/lib/services/leads.service"
 import type { ActivityWithActor } from "@/lib/services/activities.service"
@@ -87,34 +87,6 @@ export function DealDetailView({
       }
       router.refresh()
     })
-  }
-
-  const formatActivityTitle = (activity: ActivityWithActor) => {
-    const actorName =
-      activity.actor?.full_name || activity.actor?.email || "Team member"
-    const details = (activity.details || {}) as Record<string, unknown>
-
-    switch (activity.action) {
-      case "deal_created":
-        return `${actorName} created this deal`
-      case "deal_stage_changed":
-        return `${actorName} changed stage from "${String(
-          details.previous_stage || ""
-        ).replace("_", " ")}" to "${String(details.new_stage || "").replace(
-          "_",
-          " "
-        )}"`
-      case "deal_assigned":
-        return `${actorName} re-assigned this deal`
-      case "deal_updated":
-        return `${actorName} updated deal details`
-      case "deal_deleted":
-        return `${actorName} archived this deal`
-      case "deal_restored":
-        return `${actorName} restored this deal`
-      default:
-        return `${actorName} performed ${activity.action.replace("_", " ")}`
-    }
   }
 
   const formattedValue = new Intl.NumberFormat("en-US", {
@@ -430,39 +402,14 @@ export function DealDetailView({
               </CardTitle>
             </CardHeader>
             <CardContent className="text-xs">
-              {activities.length === 0 ? (
-                <div className="p-6 rounded-md border border-dashed border-border text-center text-muted-foreground">
-                  <Sparkles className="h-5 w-5 mx-auto mb-2 opacity-50" />
-                  No recorded events yet for this deal.
-                </div>
-              ) : (
-                <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-[1px] before:bg-border">
-                  {activities.map((act) => {
-                    const actorName =
-                      act.actor?.full_name || act.actor?.email || "User"
-                    return (
-                      <div key={act.id} className="relative space-y-1">
-                        <div className="absolute -left-6 top-1 h-2.5 w-2.5 rounded-full border-2 border-background bg-primary" />
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-semibold text-foreground">
-                            {formatActivityTitle(act)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                          <span>{actorName}</span>
-                          <span>•</span>
-                          <span>
-                            {new Date(act.created_at).toLocaleString(undefined, {
-                              dateStyle: "short",
-                              timeStyle: "short",
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
+              <ActivityTimeline
+                activities={activities}
+                entityType="deal"
+                entityId={deal.id}
+                entityName={deal.title}
+                emptyTitle="No recorded events yet"
+                emptyDescription="Events, notes, and interactions on this deal will appear here."
+              />
             </CardContent>
           </Card>
         </div>

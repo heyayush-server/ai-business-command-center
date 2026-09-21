@@ -437,8 +437,10 @@ export interface Database {
           actor_type: ActorType
           user_id: string | null
           entity_type: string
-          entity_id: string
+          entity_id: string | null
           action: string
+          title: string | null
+          description: string | null
           details: Json | null
           created_at: string
         }
@@ -448,8 +450,10 @@ export interface Database {
           actor_type?: ActorType
           user_id?: string | null
           entity_type: string
-          entity_id: string
+          entity_id?: string | null
           action: string
+          title?: string | null
+          description?: string | null
           details?: Json | null
           created_at?: string
         }
@@ -459,8 +463,10 @@ export interface Database {
           actor_type?: ActorType
           user_id?: string | null
           entity_type?: string
-          entity_id?: string
+          entity_id?: string | null
           action?: string
+          title?: string | null
+          description?: string | null
           details?: Json | null
           created_at?: string
         }

@@ -31,6 +31,7 @@ import {
   updateLeadStatusAction,
   assignLeadAction,
 } from "@/lib/actions/leads.actions"
+import { ActivityTimeline } from "@/components/features/activities/activity-timeline"
 import type {
   LeadWithAssignee,
   OrganizationMemberOption,
@@ -84,29 +85,6 @@ export function LeadDetailView({
       await assignLeadAction({ id: lead.id, assigned_to: assignedTo })
       router.refresh()
     })
-  }
-
-  const formatActivityTitle = (activity: ActivityWithActor) => {
-    const actorName =
-      activity.actor?.full_name || activity.actor?.email || "Team member"
-    const details = (activity.details || {}) as Record<string, unknown>
-
-    switch (activity.action) {
-      case "lead.created":
-        return `${actorName} captured this lead`
-      case "lead.status_changed":
-        return `${actorName} changed status to "${details.new_status}"`
-      case "lead.assigned":
-        return `${actorName} updated the assigned owner`
-      case "lead.updated":
-        return `${actorName} updated lead information`
-      case "lead.deleted":
-        return `${actorName} soft deleted this lead`
-      case "lead.restored":
-        return `${actorName} restored this lead`
-      default:
-        return `${actorName} performed ${activity.action}`
-    }
   }
 
   return (
@@ -381,42 +359,20 @@ export function LeadDetailView({
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary" />
                 <span>Audit & Activity Log</span>
+                <Badge variant="outline" className="text-[11px] ml-1.5">
+                  {activities.length}
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-xs">
-              {activities.length === 0 ? (
-                <p className="text-muted-foreground py-4 text-center">
-                  No activity records logged yet.
-                </p>
-              ) : (
-                <div className="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-border">
-                  {activities.map((act) => {
-                    const details = (act.details || {}) as Record<string, unknown>
-                    return (
-                      <div key={act.id} className="relative group">
-                        {/* Timeline bullet */}
-                        <div className="absolute -left-6 top-1 h-3 w-3 rounded-full border-2 border-background bg-primary" />
-                        <div className="flex flex-col gap-0.5">
-                          <p className="font-medium text-foreground text-xs leading-snug">
-                            {formatActivityTitle(act)}
-                          </p>
-                          <span className="text-[11px] text-muted-foreground">
-                            {new Date(act.created_at).toLocaleString(undefined, {
-                              dateStyle: "short",
-                              timeStyle: "short",
-                            })}
-                          </span>
-                          {details.previous_status && details.new_status ? (
-                            <div className="mt-1 text-[11px] text-muted-foreground bg-muted/40 p-1.5 rounded">
-                              Status: <span className="font-semibold text-foreground">{String(details.previous_status)}</span> → <span className="font-semibold text-primary">{String(details.new_status)}</span>
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
+              <ActivityTimeline
+                activities={activities}
+                entityType="lead"
+                entityId={lead.id}
+                entityName={`${lead.first_name} ${lead.last_name}`}
+                emptyTitle="No activity records yet"
+                emptyDescription="Interactions, notes, calls, and status updates on this lead will appear here."
+              />
             </CardContent>
           </Card>
         </div>

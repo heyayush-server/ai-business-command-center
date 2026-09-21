@@ -15,6 +15,7 @@ import {
   Briefcase,
   Contact,
   Clock,
+  Plus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/dialog"
 import { TaskStatusBadge } from "./task-status-badge"
 import { TaskPriorityBadge } from "./task-priority-badge"
+import { CreateActivityDialog } from "@/components/features/activities/create-activity-dialog"
 import type { TaskWithDetails } from "@/lib/services/tasks.service"
 
 interface TaskDetailDialogProps {
@@ -235,6 +237,23 @@ export function TaskDetailDialog({
                 </>
               )}
             </Button>
+
+            <CreateActivityDialog
+              defaultEntityType="task"
+              defaultEntityId={task.id}
+              entityName={task.title}
+              trigger={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="text-xs gap-1.5"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Add Note</span>
+                </Button>
+              }
+            />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
