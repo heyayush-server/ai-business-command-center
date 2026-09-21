@@ -16,6 +16,7 @@
     "@ai-sdk/openai": "^4.0.71",
     "@ai-sdk/react": "^4.0.110",
     "@base-ui/react": "^1.8.0",
+    "@google/genai": "^2.23.0",
     "@hookform/resolvers": "^5.9.1",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",

@@ -83,6 +83,116 @@ const STAGE_CONFIG: Record<DealStage, { label: string; color: string }> = {
   closed_lost: { label: "Closed Lost", color: "bg-slate-400" },
 }
 
+const isDevMock =
+  process.env.NODE_ENV !== "test" &&
+  (!process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))
+
+function getMockDashboardData(): DashboardData {
+  return {
+    kpis: {
+      totalLeads: 32,
+      recentLeadsCount: 8,
+      totalCustomers: 14,
+      recentCustomersCount: 3,
+      openDealsCount: 18,
+      openDealsValue: 142500,
+      wonDealsCount: 12,
+      wonDealsValue: 98000,
+      recentWonDealsCount: 2,
+      totalPipelineValue: 142500,
+      openTasksCount: 5,
+      tasksDueSoonCount: 3,
+    },
+    pipeline: {
+      stages: [
+        { stage: "discovery", label: "Discovery", count: 5, totalValue: 38500, percentage: 27, color: "bg-blue-500" },
+        { stage: "proposal", label: "Proposal", count: 3, totalValue: 42000, percentage: 29, color: "bg-amber-500" },
+        { stage: "negotiation", label: "Negotiation", count: 4, totalValue: 26000, percentage: 18, color: "bg-purple-500" },
+        { stage: "closed_won", label: "Closed Won", count: 2, totalValue: 36000, percentage: 25, color: "bg-emerald-500" },
+        { stage: "closed_lost", label: "Closed Lost", count: 0, totalValue: 0, percentage: 0, color: "bg-slate-400" },
+      ],
+      totalValue: 142500,
+      totalDeals: 14,
+    },
+    leadCustomer: {
+      totalLeads: 32,
+      leadsByStatus: { new: 8, contacted: 12, qualifying: 6, qualified: 4, lost: 2 },
+      totalCustomers: 14,
+      recentCustomers: [
+        { id: "cust-1", name: "Apex Logistics Inc", industry: "Logistics", created_at: new Date().toISOString(), converted_from_lead_id: "lead-1" },
+        { id: "cust-2", name: "TechFlow Solutions", industry: "Technology", created_at: new Date().toISOString(), converted_from_lead_id: "lead-2" },
+      ],
+      convertedLeadsCount: 4,
+      conversionRate: 12.5,
+    },
+    taskOverview: {
+      overdueCount: 3,
+      dueTodayCount: 2,
+      dueThisWeekCount: 5,
+      tasksByStatus: { todo: 3, in_progress: 2, done: 12, cancelled: 0 },
+      highUrgentOpenCount: 2,
+      openTasks: 5,
+      completedTasks: 12,
+    },
+    recentActivities: [
+      {
+        id: "act-1",
+        organization_id: "00000000-0000-0000-0000-000000000001",
+        actor_type: "user",
+        user_id: "00000000-0000-0000-0000-000000000001",
+        action: "deal.created",
+        title: "Deal Created",
+        description: "CloudScale Systems Expansion ($48,000)",
+        entity_type: "deal",
+        entity_id: "deal-1",
+        details: { title: "CloudScale Systems Expansion", value: 48000 },
+        created_at: new Date().toISOString(),
+        actor: {
+          id: "00000000-0000-0000-0000-000000000001",
+          full_name: "Ishan Sharma",
+          email: "dev@commandcenter.io",
+          avatar_url: null,
+        },
+      },
+      {
+        id: "act-2",
+        organization_id: "00000000-0000-0000-0000-000000000001",
+        actor_type: "ai",
+        user_id: null,
+        action: "task.created",
+        title: "AI Task Suggested",
+        description: "Follow-up with Rahul Patel",
+        entity_type: "task",
+        entity_id: "task-1",
+        details: { title: "Follow-up with Rahul Patel" },
+        created_at: new Date(Date.now() - 3600000).toISOString(),
+        actor: null,
+      },
+    ],
+    priorityWork: [
+      {
+        id: "pri-1",
+        type: "overdue_task",
+        title: "Finalize MSA agreement with FinCorp",
+        subtitle: "Task was due yesterday • High priority",
+        badgeText: "Overdue",
+        badgeVariant: "destructive",
+        href: "/tasks",
+      },
+      {
+        id: "pri-2",
+        type: "deal_needs_attention",
+        title: "CloudScale Systems Migration ($48,000)",
+        subtitle: "In Proposal stage for 18 days without touchpoint",
+        badgeText: "Stalled Deal",
+        badgeVariant: "secondary",
+        href: "/deals",
+      },
+    ],
+  }
+}
+
 /**
  * Server-side aggregator for all organization-scoped dashboard metrics.
  * Runs queries in parallel, prevents N+1 lookups, and respects RLS.
@@ -92,6 +202,10 @@ export async function getDashboardData(
 ): Promise<DashboardData> {
   if (!organizationId) {
     throw new Error("Organization ID is required")
+  }
+
+  if (isDevMock) {
+    return getMockDashboardData()
   }
 
   const supabase = await createClient()

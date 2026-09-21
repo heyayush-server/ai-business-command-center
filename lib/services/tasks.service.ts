@@ -130,6 +130,23 @@ export async function validateDealBelongsToOrg(
 export async function getTaskEntityOptions(
   organizationId: string
 ): Promise<TaskEntityOptions> {
+  if (process.env.NODE_ENV !== "test" && (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))) {
+    return {
+      leads: [
+        { id: "lead-1", name: "Rahul Patel", company: "TechFlow Solutions" },
+        { id: "lead-2", name: "Sarah Jenkins", company: "Apex Logistics" },
+      ],
+      customers: [
+        { id: "cust-1", name: "Apex Logistics Inc" },
+        { id: "cust-2", name: "TechFlow Solutions" },
+      ],
+      deals: [
+        { id: "deal-1", title: "CloudScale Systems Expansion", customer_name: "Apex Logistics Inc" },
+        { id: "deal-2", title: "TechFlow Enterprise Rollout", customer_name: "TechFlow Solutions" },
+      ],
+    }
+  }
+
   const supabase = await createClient()
 
   const [leadsRes, customersRes, dealsRes] = await Promise.all([
@@ -186,6 +203,17 @@ export async function getTasks(
   params: Partial<TaskFilterParams>,
   organizationId: string
 ): Promise<GetTasksResult> {
+  if (process.env.NODE_ENV !== "test" && (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))) {
+    const { MOCK_DEV_TASKS } = await import("@/lib/mock/crm-entities")
+    return {
+      tasks: MOCK_DEV_TASKS,
+      total: MOCK_DEV_TASKS.length,
+      page: 1,
+      pageSize: 50,
+      totalPages: 1,
+    }
+  }
+
   const supabase = await createClient()
 
   const page = Math.max(1, params.page || 1)

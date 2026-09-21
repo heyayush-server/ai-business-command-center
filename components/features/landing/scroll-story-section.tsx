@@ -247,13 +247,27 @@ export function ScrollStorySection() {
                       </p>
                     </div>
 
-                    <div className="rounded-xl border border-dashed border-destructive/40 bg-destructive/5 p-3.5 space-y-2 col-span-2 sm:col-span-2">
+                    <div className="rounded-xl border border-dashed border-destructive/40 bg-destructive/5 p-3 space-y-1.5 col-span-2 sm:col-span-2">
                       <div className="flex items-center gap-2 text-destructive">
                         <AlertTriangle className="h-4 w-4" />
-                        <span className="text-xs font-bold">The Result</span>
+                        <span className="text-xs font-bold">The Reality</span>
                       </div>
                       <p className="text-[11px] text-muted-foreground">
                         Deals quietly stall, follow-ups are missed, and business owners have no clear view of revenue.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="relative rounded-xl overflow-hidden border border-border/80 shadow-xs aspect-16/9 mt-1">
+                    <Image
+                      src="/images/scattered-to-unified.jpg"
+                      alt="Scattered business data transforming into organized command center"
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent flex items-end p-3">
+                      <p className="text-[11px] text-foreground font-medium">
+                        Scattered documents, tasks, and leads waiting for structure
                       </p>
                     </div>
                   </div>

@@ -64,6 +64,18 @@ export async function validateAssigneeMembership(
 export async function getOrganizationMembers(
   organizationId: string
 ): Promise<OrganizationMemberOption[]> {
+  if (process.env.NODE_ENV !== "test" && (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))) {
+    return [
+      {
+        userId: "00000000-0000-0000-0000-000000000001",
+        role: "owner",
+        fullName: "Ishan Sharma",
+        email: "dev@commandcenter.io",
+        avatarUrl: null,
+      },
+    ]
+  }
+
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -112,6 +124,17 @@ export async function getLeads(
   params: Partial<LeadFilterParams>,
   organizationId: string
 ): Promise<GetLeadsResult> {
+  if (process.env.NODE_ENV !== "test" && (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))) {
+    const { MOCK_DEV_LEADS } = await import("@/lib/mock/crm-entities")
+    return {
+      leads: MOCK_DEV_LEADS,
+      total: MOCK_DEV_LEADS.length,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+    }
+  }
+
   const supabase = await createClient()
 
   const page = Math.max(1, params.page || 1)

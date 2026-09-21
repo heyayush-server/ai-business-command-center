@@ -80,6 +80,17 @@ export async function getDeals(
   params: Partial<DealFilterParams>,
   organizationId: string
 ): Promise<GetDealsResult> {
+  if (process.env.NODE_ENV !== "test" && (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))) {
+    const { MOCK_DEV_DEALS } = await import("@/lib/mock/crm-entities")
+    return {
+      deals: MOCK_DEV_DEALS,
+      total: MOCK_DEV_DEALS.length,
+      page: 1,
+      pageSize: 50,
+      totalPages: 1,
+    }
+  }
+
   const supabase = await createClient()
 
   const page = Math.max(1, params.page || 1)
@@ -788,6 +799,14 @@ export async function restoreDeal(
 export async function getCustomerOptions(
   organizationId: string
 ): Promise<Array<{ id: string; name: string; contact: string | null }>> {
+  if (process.env.NODE_ENV !== "test" && (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))) {
+    return [
+      { id: "cust-1", name: "Apex Logistics Inc", contact: "Marcus Vance" },
+      { id: "cust-2", name: "TechFlow Solutions", contact: "Rahul Patel" },
+      { id: "cust-3", name: "Stripe Cloud Partners", contact: "Sarah Jenkins" },
+    ]
+  }
+
   const supabase = await createClient()
 
   const { data, error } = await supabase

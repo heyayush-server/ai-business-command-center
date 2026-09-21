@@ -52,6 +52,17 @@ export async function getCustomers(
   params: Partial<CustomerFilterParams>,
   organizationId: string
 ): Promise<GetCustomersResult> {
+  if (process.env.NODE_ENV !== "test" && (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))) {
+    const { MOCK_DEV_CUSTOMERS } = await import("@/lib/mock/crm-entities")
+    return {
+      customers: MOCK_DEV_CUSTOMERS,
+      total: MOCK_DEV_CUSTOMERS.length,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
+    }
+  }
+
   const supabase = await createClient()
 
   const page = Math.max(1, params.page || 1)

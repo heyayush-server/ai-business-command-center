@@ -39,6 +39,7 @@ export default function OnboardingPage() {
             <Input
               id="fullName"
               name="fullName"
+              defaultValue="Ishan Sharma"
               placeholder="e.g. Ishan Sharma"
               disabled={isPending}
             />
@@ -49,6 +50,7 @@ export default function OnboardingPage() {
             <Input
               id="organizationName"
               name="organizationName"
+              defaultValue="Acme Global Operations"
               placeholder="e.g. Acme Global Operations"
               required
               disabled={isPending}

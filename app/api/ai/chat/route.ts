@@ -3,7 +3,8 @@ import { getUser } from "@/lib/auth/getUser"
 import { getCurrentOrganization } from "@/lib/auth/getCurrentOrganization"
 import { getMCPTools } from "@/lib/mcp/server"
 import type { MCPContext } from "@/lib/mcp/context"
-import { getAIModel, getModelId, isAIMockMode } from "@/lib/ai/provider"
+import { getActiveProvider, getAIModel, getModelId, isAIMockMode } from "@/lib/ai/provider"
+import { handleGeminiChat } from "@/lib/ai/gemini"
 import { buildSystemPrompt } from "@/lib/ai/prompts/system"
 import { handleMockChat } from "@/lib/ai/mock"
 import { checkUsageLimit, recordUsageTokens } from "@/lib/services/ai-usage.service"
@@ -131,7 +132,21 @@ export async function POST(req: Request) {
       })
     }
 
-    // 8. Live mode execution with AI SDK 7
+    // 8. Live mode execution
+    const activeProvider = getActiveProvider()
+
+    // 8A. Google Gemini Execution (official @google/genai SDK)
+    if (activeProvider === "gemini") {
+      return await handleGeminiChat({
+        messages,
+        serverContext: mcpContext,
+        orgName: currentOrg.organizationName,
+        userName: user.email || "Workspace User",
+        conversationRecordId: conv.id,
+      })
+    }
+
+    // 8B. Anthropic / OpenAI Execution via AI SDK 7 streamText
     const modelMessages = await convertToModelMessages(messages)
     const model = getAIModel()
     const modelId = getModelId()

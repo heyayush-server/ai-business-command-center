@@ -207,6 +207,17 @@ export async function getActivities(
   params: Partial<ActivityFilterParams>,
   organizationId: string
 ): Promise<GetActivitiesResult> {
+  if (process.env.NODE_ENV !== "test" && (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))) {
+    const { MOCK_DEV_ACTIVITIES } = await import("@/lib/mock/crm-entities")
+    return {
+      activities: MOCK_DEV_ACTIVITIES,
+      total: MOCK_DEV_ACTIVITIES.length,
+      page: 1,
+      pageSize: 50,
+      totalPages: 1,
+    }
+  }
+
   const supabase = await createClient()
 
   const page = Math.max(1, params.page || 1)

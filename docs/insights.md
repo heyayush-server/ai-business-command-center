@@ -87,3 +87,18 @@ Recommendations in insights are strictly **informational signals**. When a user 
 ```
 
 The AI **never** bypasses the pending action flow or mutates CRM records directly.
+
+---
+
+## Phase 15: Google Gemini AI Integration & Insights Caching
+
+In Phase 15, the insights engine is enhanced with:
+1. **Real Runtime Gemini Integration (`@google/genai`)**:
+   - The AI Copilot dynamically connects to Google Gemini via `@google/genai` SDK using `AI_PROVIDER=gemini` and `GEMINI_MODEL=gemini-2.5-flash`.
+   - The MCP tool `get_business_insights` is exposed to Gemini as a native function declaration, allowing Gemini to analyze real-time business anomalies and provide executive briefings on demand.
+2. **Deterministic 30-Second TTL Caching**:
+   - Memory caching (`CACHE_TTL_MS = 30_000`) prevents redundant parallel queries during rapid user interactions or concurrent AI chat invocations.
+   - Cache is bypassable via `{ skipCache: true }` and explicitly clearable via `clearInsightsCache(orgId)`.
+3. **Landing Page Sandbox Simulation**:
+   - Prospective clients can experience the proactive insights engine directly from the public landing page via an isolated client-side simulation.
+

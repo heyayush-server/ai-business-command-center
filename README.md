@@ -207,7 +207,9 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 # AI Configuration
 # Set AI_MODE="mock" for zero-cost local testing without API keys
 AI_MODE=mock
-AI_PROVIDER=anthropic
+AI_PROVIDER=gemini # gemini | anthropic | openai
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
 ANTHROPIC_API_KEY=your_anthropic_key
 OPENAI_API_KEY=your_openai_key
 
@@ -304,12 +306,13 @@ npm run build
 | **Phase 12** | Organization RAG Knowledge Base (PDF/TXT/MD via pgvector) | ✅ Completed |
 | **Phase 13** | MCP-Powered Business Copilot & Tool Layer Architecture | ✅ Completed |
 | **Phase 14** | Proactive AI Business Intelligence & Deterministic Insights Engine | ✅ Completed |
-| **Phase 15** | Premium Landing Page, 3D Mouse Parallax & Live Interactive Sandbox | ✅ Completed |
+| **Phase 15** | Production Hardening, Real Google Gemini AI (@google/genai), Security Audit & Interactive Landing Page | ✅ Completed |
 
 ---
 
 ## 📖 Documentation Links
 
+- [Security Architecture & Audit Report (docs/security-audit.md)](docs/security-audit.md)
 - [Proactive Insights Engine Architecture (docs/insights.md)](docs/insights.md)
 
 ---

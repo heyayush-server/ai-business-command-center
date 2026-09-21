@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import {
   ShieldCheck,
   CheckCircle2,
@@ -82,6 +83,22 @@ export function HumanControlSection() {
                     One click completes the change, updates your dashboard, and logs the action in your transparent company audit stream.
                   </p>
                 </div>
+              </div>
+            </div>
+
+            {/* Visual Supervisory Pipeline Graphic */}
+            <div className="relative rounded-xl overflow-hidden border border-border bg-card shadow-xs mt-4">
+              <div className="relative aspect-16/9 w-full">
+                <Image
+                  src="/images/human-approval-flow.jpg"
+                  alt="AI Suggestion to Human Review and Approved Action Flow"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-2.5 bg-card/95 border-t border-border/60 flex items-center justify-between text-[11px] text-muted-foreground">
+                <span className="font-semibold text-foreground">Supervised AI Pipeline</span>
+                <span>AI Suggests • Human Decides</span>
               </div>
             </div>
           </div>

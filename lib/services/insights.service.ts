@@ -45,6 +45,104 @@ export function clearInsightsCache(organizationId?: string): void {
   }
 }
 
+// ── Mock Insights for Dev / Offline Mode ──────────────────────────────────────
+
+const isDevMock =
+  process.env.NODE_ENV !== "test" &&
+  (!process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))
+
+function getMockBusinessInsights(): InsightsResult {
+  const insights: BusinessInsight[] = [
+    {
+      id: "ins-1",
+      type: "OVERDUE_TASK",
+      severity: "critical",
+      title: "3 tasks are overdue",
+      description: "High-priority client deliverables missed their scheduled due date without completion.",
+      entityType: "task",
+      entityId: "task-102",
+      recommendedAction: {
+        label: "View Overdue Tasks",
+        actionType: "view",
+        targetHref: "/tasks",
+      },
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "ins-2",
+      type: "STALE_LEAD",
+      severity: "warning",
+      title: "4 leads need follow-up",
+      description: "Qualified prospects (including Rahul Patel) have had zero communication in >10 days.",
+      entityType: "lead",
+      entityId: "lead-44",
+      recommendedAction: {
+        label: "Review Inactive Leads",
+        actionType: "view",
+        targetHref: "/leads",
+      },
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "ins-3",
+      type: "STALE_DEAL",
+      severity: "warning",
+      title: "1 deal has been inactive for 14 days",
+      description: "CloudScale Systems Expansion ($48,000) has had no stage progression in 18 days.",
+      entityType: "deal",
+      entityId: "deal-98",
+      recommendedAction: {
+        label: "Inspect Stalled Deal",
+        actionType: "view",
+        targetHref: "/deals",
+      },
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "ins-4",
+      type: "PIPELINE_RISK",
+      severity: "info",
+      title: "Pipeline Concentration Risk (48%)",
+      description: "A single enterprise deal represents 48% of your active pipeline value ($68k of $142k).",
+      entityType: "deal",
+      entityId: null,
+      recommendedAction: {
+        label: "View Pipeline Breakdown",
+        actionType: "view",
+        targetHref: "/deals",
+      },
+      createdAt: new Date().toISOString(),
+    },
+  ]
+
+  const briefing: BusinessBriefing = {
+    headline: "1 critical task and 2 warnings require attention",
+    summary: "1 critical overdue task and 2 operational warnings require executive attention.",
+    metrics: {
+      totalInsights: 4,
+      criticalCount: 1,
+      warningCount: 2,
+      infoCount: 1,
+      overdueTasksCount: 3,
+      staleLeadsCount: 4,
+      staleDealsCount: 1,
+      inactiveCustomersCount: 0,
+    },
+    keyFindings: [
+      "Finalize overdue contract deliverable for FinCorp",
+      "Re-engage stalled enterprise prospect Rahul Patel ($65,000)",
+    ],
+    generatedAt: new Date().toISOString(),
+  }
+
+  return {
+    briefing,
+    insights,
+    total: 4,
+  }
+}
+
 // ── Primary Insights Aggregator ───────────────────────────────────────────────
 
 export interface GetInsightsOptions {
@@ -66,12 +164,15 @@ export async function getBusinessInsights(
 
   const { severity = "all", limit = 50, skipCache = false } = options
 
-  // 1. Check in-memory cache if caching is not skipped
   if (!skipCache) {
     const cached = insightsCache.get(organizationId)
     if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
       return filterInsightsResult(cached.data, severity, limit)
     }
+  }
+
+  if (isDevMock) {
+    return filterInsightsResult(getMockBusinessInsights(), severity, limit)
   }
 
   const supabase = await createClient()
