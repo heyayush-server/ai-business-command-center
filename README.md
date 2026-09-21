@@ -72,18 +72,23 @@ Interactive Approval Card Rendered in Chat / UI
 
 ## 🌟 Core Capabilities
 
-### 1. Proactive AI Business Intelligence (Phase 14)
+### 1. Interactive Product Experience & Sandbox (Phase 15)
+- **Live In-Browser Simulation**: Prospective users can interact with a live simulated Command Center directly on the landing page (Dashboard ➔ Copilot ➔ Insight ➔ Staged Action ➔ Human Approval).
+- **Safe Client Sandbox**: The landing page demo operates in an isolated client state with zero real database mutations or API token costs.
+- **3D Mouse Parallax & Scroll Storytelling**: Subtle pointer tilt dynamics on desktop and responsive step-by-step narrative guiding users from fragmented silos to supervised intelligence.
+
+### 2. Proactive AI Business Intelligence (Phase 14)
 - **Deterministic Rules Engine**: Identifies overdue tasks, stalled deals, stale leads, inactive customer accounts, pipeline concentration risks, and activity logging gaps.
 - **Hallucination-Free Executive Briefing**: Synthesizes factual numbers directly from database aggregates with zero fake metrics.
 - **Categorized Severity**: Flags issues across `critical`, `warning`, and `info` tiers.
 - **Executive Dashboard Integration**: Dedicated AI Insights section on the dashboard with direct entity navigation and action triggers.
 
-### 2. AI Business Copilot & MCP Tool Layer (Phase 13)
+### 3. AI Business Copilot & MCP Tool Layer (Phase 13)
 - **Unified MCP Registry (`lib/mcp/server.ts`)**: Binds AI tools dynamically to authenticated user and organization session contexts.
 - **Read & Write Tool Separation**: Read operations execute immediately; write operations route through `prepare_*` tools for supervisor approval.
 - **Role-Gated Permissions**: Viewers can run analytical queries and read insights, but cannot stage write actions.
 
-### 3. RAG Company Knowledge Base (Phase 12)
+### 4. RAG Company Knowledge Base (Phase 12)
 - **Document Ingestion**: Supports PDF, TXT, and Markdown upload with chunking and organization-isolated vector storage via PostgreSQL `pgvector`.
 - **Private Storage**: Stored in a private Supabase Storage bucket; access is strictly verified on the server.
 - **Semantic Retrieval**: The AI assistant uses semantic search to cite company SOPs, refund policies, and pricing guides without prompt injection vulnerabilities.
@@ -259,6 +264,7 @@ npm run build
 | **Phase 12** | Organization RAG Knowledge Base (PDF/TXT/MD via pgvector) | ✅ Completed |
 | **Phase 13** | MCP-Powered Business Copilot & Tool Layer Architecture | ✅ Completed |
 | **Phase 14** | Proactive AI Business Intelligence & Deterministic Insights Engine | ✅ Completed |
+| **Phase 15** | Premium Landing Page, 3D Mouse Parallax & Live Interactive Sandbox | ✅ Completed |
 
 ---
 
