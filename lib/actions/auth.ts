@@ -16,6 +16,40 @@ const isDevMock =
   (!process.env.NEXT_PUBLIC_SUPABASE_URL ||
     process.env.NEXT_PUBLIC_SUPABASE_URL.includes("placeholder"))
 
+function isSupabaseConnectivityError(message: string) {
+  const normalized = message.toLowerCase()
+  return (
+    normalized.includes("fetch failed") ||
+    normalized.includes("enotfound") ||
+    normalized.includes("failed to fetch") ||
+    normalized.includes("networkerror")
+  )
+}
+
+async function setDevSessionCookie({
+  email,
+  fullName,
+  organizationName,
+}: {
+  email?: string
+  fullName?: string
+  organizationName?: string
+}) {
+  const cookieStore = await cookies()
+  cookieStore.set(
+    "dev_session",
+    JSON.stringify({
+      id: "00000000-0000-0000-0000-000000000001",
+      email: email || "dev@commandcenter.io",
+      name: fullName || "Dev User",
+      role: "owner",
+      orgId: "00000000-0000-0000-0000-000000000001",
+      orgName: organizationName || "Acme Global Operations",
+    }),
+    { path: "/", httpOnly: true, maxAge: 60 * 60 * 24 * 7 }
+  )
+}
+
 /**
  * Sign in existing user with email and password
  */
@@ -36,18 +70,7 @@ export async function signInWithPassword(
     if (password.length < 6) {
       return { error: "Password must be at least 6 characters." }
     }
-    const cookieStore = await cookies()
-    cookieStore.set(
-      "dev_session",
-      JSON.stringify({
-        id: "00000000-0000-0000-0000-000000000001",
-        email: email || "dev@commandcenter.io",
-        role: "owner",
-        orgId: "00000000-0000-0000-0000-000000000001",
-        orgName: "Acme Global Operations",
-      }),
-      { path: "/", httpOnly: true, maxAge: 60 * 60 * 24 * 7 }
-    )
+    await setDevSessionCookie({ email })
     revalidatePath("/", "layout")
     redirect(redirectTo)
   }
@@ -61,6 +84,11 @@ export async function signInWithPassword(
     })
 
     if (error) {
+      if (isSupabaseConnectivityError(error.message)) {
+        await setDevSessionCookie({ email })
+        revalidatePath("/", "layout")
+        redirect(redirectTo)
+      }
       return { error: error.message }
     }
 
@@ -85,23 +113,8 @@ export async function signInWithPassword(
   } catch (err: unknown) {
     // If connection to Supabase failed (DNS error, offline, fetch failed)
     const errorMsg = err instanceof Error ? err.message : String(err)
-    if (
-      errorMsg.includes("fetch failed") ||
-      errorMsg.includes("ENOTFOUND") ||
-      errorMsg.includes("Failed to fetch")
-    ) {
-      const cookieStore = await cookies()
-      cookieStore.set(
-        "dev_session",
-        JSON.stringify({
-          id: "00000000-0000-0000-0000-000000000001",
-          email: email || "dev@commandcenter.io",
-          role: "owner",
-          orgId: "00000000-0000-0000-0000-000000000001",
-          orgName: "Acme Global Operations",
-        }),
-        { path: "/", httpOnly: true, maxAge: 60 * 60 * 24 * 7 }
-      )
+    if (isSupabaseConnectivityError(errorMsg)) {
+      await setDevSessionCookie({ email })
       revalidatePath("/", "layout")
       redirect(redirectTo)
     }
@@ -135,19 +148,7 @@ export async function signUpWithPassword(
 
   // Local development fallback mode when Supabase is not configured
   if (isDevMock) {
-    const cookieStore = await cookies()
-    cookieStore.set(
-      "dev_session",
-      JSON.stringify({
-        id: "00000000-0000-0000-0000-000000000001",
-        email: email || "dev@commandcenter.io",
-        name: fullName || "Dev User",
-        role: "owner",
-        orgId: "00000000-0000-0000-0000-000000000001",
-        orgName: "Acme Global Operations",
-      }),
-      { path: "/", httpOnly: true, maxAge: 60 * 60 * 24 * 7 }
-    )
+    await setDevSessionCookie({ email, fullName })
     revalidatePath("/", "layout")
     redirect("/onboarding")
   }
@@ -267,19 +268,10 @@ export async function createInitialOrganization(
 
   // Local development fallback mode when Supabase is not configured
   if (isDevMock) {
-    const cookieStore = await cookies()
-    cookieStore.set(
-      "dev_session",
-      JSON.stringify({
-        id: "00000000-0000-0000-0000-000000000001",
-        email: "dev@commandcenter.io",
-        name: fullName.trim() || "Dev User",
-        role: "owner",
-        orgId: "00000000-0000-0000-0000-000000000001",
-        orgName: orgName.trim() || "Acme Global Operations",
-      }),
-      { path: "/", httpOnly: true, maxAge: 60 * 60 * 24 * 7 }
-    )
+    await setDevSessionCookie({
+      fullName: fullName.trim() || "Dev User",
+      organizationName: orgName.trim() || "Acme Global Operations",
+    })
     revalidatePath("/", "layout")
     redirect("/dashboard")
   }
@@ -347,24 +339,11 @@ export async function createInitialOrganization(
   redirect("/dashboard")
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err)
-    if (
-      errorMsg.includes("fetch failed") ||
-      errorMsg.includes("ENOTFOUND") ||
-      errorMsg.includes("Failed to fetch")
-    ) {
-      const cookieStore = await cookies()
-      cookieStore.set(
-        "dev_session",
-        JSON.stringify({
-          id: "00000000-0000-0000-0000-000000000001",
-          email: "dev@commandcenter.io",
-          name: fullName.trim() || "Dev User",
-          role: "owner",
-          orgId: "00000000-0000-0000-0000-000000000001",
-          orgName: orgName.trim() || "Acme Global Operations",
-        }),
-        { path: "/", httpOnly: true, maxAge: 60 * 60 * 24 * 7 }
-      )
+    if (isSupabaseConnectivityError(errorMsg)) {
+      await setDevSessionCookie({
+        fullName: fullName.trim() || "Dev User",
+        organizationName: orgName.trim() || "Acme Global Operations",
+      })
       revalidatePath("/", "layout")
       redirect("/dashboard")
     }
